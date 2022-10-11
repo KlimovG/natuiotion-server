@@ -1,8 +1,15 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import {
+  Column,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  Unique,
+} from 'typeorm';
+import { RobotsOfCustomersModel as Robots } from '../../robot/model/robots-of-customers.model';
 
 @ObjectType()
-@Entity()
+@Entity('Customers')
 export class CustomerModel {
   @Field()
   @PrimaryGeneratedColumn()
@@ -24,4 +31,8 @@ export class CustomerModel {
   @Field()
   @Column({ name: 'hash_pwd', length: 20, nullable: false })
   hashPWD: string;
+
+  @Field((type) => [Robots], { nullable: true })
+  @OneToMany((type) => Robots, (robot) => robot.customer)
+  robots: Robots[];
 }
