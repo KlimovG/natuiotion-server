@@ -18,10 +18,27 @@ import {
       username: DB_USER,
       password: DB_PASSWORD,
       database: DB_NAME,
-      entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+      entities: [__dirname + '/../**/*.model.js'],
+      synchronize: NODE_ENV !== 'production',
+      connectorPackage: 'mysql2',
+    }),
+  ],
+  exports: [
+    TypeOrmModule.forRoot({
+      type: 'mysql',
+      host: DB_HOST,
+      port: Number(DB_PORT),
+      username: DB_USER,
+      password: DB_PASSWORD,
+      database: DB_NAME,
+      entities: ['dist/../**/*.model.js'],
       synchronize: NODE_ENV !== 'production',
       connectorPackage: 'mysql2',
     }),
   ],
 })
-export class DatabaseModule {}
+export class DatabaseModule {
+  constructor() {
+    console.log(__dirname + '/../**/*.model.js');
+  }
+}
