@@ -30,7 +30,7 @@ export class UserModel {
 
   @Field()
   @Column({ name: 'hash_pwd', length: 20, nullable: false })
-  hashPWD: string;
+  password: string;
 
   @Field((type) => [Robots], { nullable: true })
   @OneToMany((type) => Robots, (robot) => robot.user)
