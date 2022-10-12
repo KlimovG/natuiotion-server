@@ -22,4 +22,11 @@ export class UserService {
   findOne(id: number): Promise<UserModel> {
     return this.repository.findOneBy({ id });
   }
+
+  findByLoginAndPassword(login: string, password: string): Promise<UserModel> {
+    return this.repository.findOneBy({
+      email: login,
+      password: password,
+    });
+  }
 }
