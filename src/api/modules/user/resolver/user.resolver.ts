@@ -1,24 +1,24 @@
 import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
-import { CustomerModel } from '../model/customer.model';
+import { UserModel } from '../model/user.model';
 import { Inject } from '@nestjs/common';
-import { CustomerService } from '../service/customer.service';
+import { UserService } from '../service/user.service';
 import { RobotsOfCustomersModel as RobotsModel } from '../../robot/model/robots-of-customers.model';
 import { RobotsOfCustomersService as RobotsService } from '../../robot/service/robots-of-customers.service';
 
-@Resolver((of) => CustomerModel)
-export class CustomerResolver {
+@Resolver((of) => UserModel)
+export class UserResolver {
   constructor(
-    @Inject(CustomerService) private customerService: CustomerService,
+    @Inject(UserService) private customerService: UserService,
     private robotsService: RobotsService,
   ) {}
 
-  @Query((returns) => [CustomerModel])
-  async customers(): Promise<CustomerModel[]> {
+  @Query((returns) => [UserModel])
+  async customers(): Promise<UserModel[]> {
     return await this.customerService.findAll();
   }
 
-  @Query((returns) => CustomerModel)
-  async customer(@Args('id') id: number): Promise<CustomerModel> {
+  @Query((returns) => UserModel)
+  async customer(@Args('id') id: number): Promise<UserModel> {
     return await this.customerService.findOne(id);
   }
 

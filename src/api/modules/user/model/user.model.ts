@@ -10,7 +10,7 @@ import { RobotsOfCustomersModel as Robots } from '../../robot/model/robots-of-cu
 
 @ObjectType()
 @Entity('Customers')
-export class CustomerModel {
+export class UserModel {
   @Field()
   @PrimaryGeneratedColumn()
   id: number;
@@ -33,6 +33,6 @@ export class CustomerModel {
   hashPWD: string;
 
   @Field((type) => [Robots], { nullable: true })
-  @OneToMany((type) => Robots, (robot) => robot.customer)
+  @OneToMany((type) => Robots, (robot) => robot.user)
   robots: Robots[];
 }

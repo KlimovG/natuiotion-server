@@ -6,7 +6,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { CustomerModel } from '../../customer/model/customer.model';
+import { UserModel } from '../../user/model/user.model';
 
 @ObjectType()
 @Entity('Robots_of_customers')
@@ -17,14 +17,14 @@ export class RobotsOfCustomersModel {
 
   @Field()
   @Column({ name: 'customer_id' })
-  customerId: number;
+  userId: number;
 
-  @Field((type) => CustomerModel, { nullable: true })
-  @ManyToOne((type) => CustomerModel, (customer) => customer.robots, {
+  @Field((type) => UserModel, { nullable: true })
+  @ManyToOne((type) => UserModel, (user) => user.robots, {
     eager: true,
   })
   @JoinColumn({ name: 'customer_id' })
-  customer: CustomerModel;
+  user: UserModel;
 
   @Field()
   @Column({ name: 'robot_serial_number' })

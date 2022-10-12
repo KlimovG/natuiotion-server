@@ -10,7 +10,7 @@ export class RobotsOfCustomersService {
     private repository: Repository<RobotsOfCustomersModel>,
   ) {}
 
-  // create(input: CustomerDto): Promise<CustomerModel> {
+  // create(input: UserDto): Promise<UserModel> {
   //   return this.repository.save(input);
   // }
 
@@ -25,7 +25,7 @@ export class RobotsOfCustomersService {
     });
   }
 
-  findByCustomer(id: number): Promise<RobotsOfCustomersModel[]> {
-    return this.repository.find({ where: { customerId: id } });
+  findByCustomer(userId: number): Promise<RobotsOfCustomersModel[]> {
+    return this.repository.find({ where: { userId } });
   }
 }

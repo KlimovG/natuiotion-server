@@ -2,15 +2,15 @@ import { RobotsOfCustomersModel } from '../model/robots-of-customers.model';
 import { Inject } from '@nestjs/common';
 import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { RobotsOfCustomersService } from '../service/robots-of-customers.service';
-import { CustomerModel } from '../../customer/model/customer.model';
-import { CustomerService } from '../../customer/service/customer.service';
+import { UserModel } from '../../user/model/user.model';
+import { UserService } from '../../user/service/user.service';
 
 @Resolver((of) => RobotsOfCustomersModel)
 export class RobotsOfCustomersResolver {
   constructor(
     @Inject(RobotsOfCustomersService)
     private robotService: RobotsOfCustomersService,
-    @Inject(CustomerService) private customerService: CustomerService,
+    @Inject(UserService) private customerService: UserService,
   ) {}
 
   @Query((returns) => RobotsOfCustomersModel)
@@ -32,9 +32,9 @@ export class RobotsOfCustomersResolver {
     return await this.robotService.findAll();
   }
 
-  @ResolveField('customer', () => CustomerModel)
+  @ResolveField('customer', () => UserModel)
   async getCustomer(@Parent() robot: RobotsOfCustomersModel) {
-    const { customerId } = robot;
-    return await this.customerService.findOne(customerId);
+    const { userId } = robot;
+    return await this.customerService.findOne(userId);
   }
 }
