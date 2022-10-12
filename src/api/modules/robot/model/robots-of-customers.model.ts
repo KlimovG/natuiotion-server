@@ -20,10 +20,13 @@ export class RobotsOfCustomersModel {
   customerId: number;
 
   @Field((type) => CustomerModel, { nullable: true })
-  customer: CustomerModel;
   @ManyToOne((type) => CustomerModel, (customer) => customer.robots, {
     eager: true,
   })
   @JoinColumn({ name: 'customer_id' })
-  customerConnection: CustomerModel;
+  customer: CustomerModel;
+
+  @Field()
+  @Column({ name: 'robot_serial_number' })
+  robotSerialNumber: string;
 }
