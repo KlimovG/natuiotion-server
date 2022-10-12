@@ -13,9 +13,11 @@ import {
 } from './core/modules/database/database.config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { CoreModule } from './core/core.module';
 
 @Module({
   imports: [
+    CoreModule,
     ApiModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
