@@ -1,5 +1,11 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { CustomerModel } from '../../customer/model/customer.model';
 
 @ObjectType()
@@ -9,8 +15,15 @@ export class RobotsOfCustomersModel {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Field((type) => CustomerModel)
-  @ManyToOne((type) => CustomerModel, (customer) => customer.robots)
-  @JoinColumn({ name: 'customer_id' })
+  @Field()
+  @Column({ name: 'customer_id' })
+  customerId: number;
+
+  @Field((type) => CustomerModel, { nullable: true })
   customer: CustomerModel;
+  @ManyToOne((type) => CustomerModel, (customer) => customer.robots, {
+    eager: true,
+  })
+  @JoinColumn({ name: 'customer_id' })
+  customerConnection: CustomerModel;
 }

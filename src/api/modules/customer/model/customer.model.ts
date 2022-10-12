@@ -33,6 +33,8 @@ export class CustomerModel {
   hashPWD: string;
 
   @Field((type) => [Robots], { nullable: true })
-  @OneToMany((type) => Robots, (robot) => robot.customer)
   robots: Robots[];
+
+  @OneToMany((type) => Robots, (robot) => robot.customer)
+  robotsConnection: Robots[];
 }

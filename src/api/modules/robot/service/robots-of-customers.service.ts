@@ -19,6 +19,13 @@ export class RobotsOfCustomersService {
   }
 
   findOne(id: number): Promise<RobotsOfCustomersModel> {
-    return this.repository.findOneBy({ id });
+    return this.repository.findOne({
+      where: { id },
+      relationLoadStrategy: 'join',
+    });
+  }
+
+  findByCustomer(id: number): Promise<RobotsOfCustomersModel[]> {
+    return this.repository.find({ where: { customerId: id } });
   }
 }
