@@ -3,6 +3,9 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ApiModule } from './api/api.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { CoreModule } from './core/core.module';
 import {
   DB_HOST,
   DB_NAME,
@@ -10,10 +13,7 @@ import {
   DB_PORT,
   DB_USER,
   NODE_ENV,
-} from './core/modules/database/database.config';
-import { GraphQLModule } from '@nestjs/graphql';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { CoreModule } from './core/core.module';
+} from './utils/constant';
 
 @Module({
   imports: [
