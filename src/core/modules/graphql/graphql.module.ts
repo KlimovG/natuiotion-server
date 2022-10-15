@@ -1,13 +1,8 @@
 import { Module } from '@nestjs/common';
-import { GraphQLModule } from '@nestjs/graphql';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { graphqlConfig } from './graphql.config';
 
 @Module({
-  imports: [
-    GraphQLModule.forRoot<ApolloDriverConfig>({
-      driver: ApolloDriver,
-      autoSchemaFile: 'schema.gql',
-    }),
-  ],
+  imports: [...graphqlConfig],
+  exports: [...graphqlConfig],
 })
 export class GraphqlModule {}

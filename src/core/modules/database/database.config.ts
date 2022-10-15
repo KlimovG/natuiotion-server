@@ -1,24 +1,27 @@
 import * as dotenv from 'dotenv';
+import {
+  DB_HOST,
+  DB_NAME,
+  DB_PASSWORD,
+  DB_PORT,
+  DB_USER,
+  NODE_ENV,
+} from '../../../utils/constant';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 dotenv.config();
-// XXX
-// export const databaseProviders: Provider<any>[] = [
-//   {
-//     provide: 'DATA_SOURCE',
-//     useFactory: async () => {
-//       const dataSource = new DataSource({
-//         type: 'mysql',
-//         host: DB_HOST,
-//         port: Number(DB_PORT),
-//         username: DB_USER,
-//         password: DB_PASSWORD,
-//         database: DB_NAME,
-//         entities: [__dirname + '/../**/*.model.js'],
-//         synchronize: NODE_ENV !== 'production',
-//         connectorPackage: 'mysql2',
-//       });
-//
-//       return dataSource.initialize();
-//     },
-//   },
-// ];
+
+export const databaseProviders = [
+  TypeOrmModule.forRoot({
+    type: 'mysql',
+    host: DB_HOST,
+    port: Number(DB_PORT),
+    username: DB_USER,
+    password: DB_PASSWORD,
+    database: DB_NAME,
+    logger: 'advanced-console',
+    entities: [__dirname + '/../**/*.model.js'],
+    synchronize: NODE_ENV === 'production',
+    connectorPackage: 'mysql2',
+  }),
+];
