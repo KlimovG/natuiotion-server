@@ -20,7 +20,7 @@ export const databaseProviders = [
     password: DB_PASSWORD,
     database: DB_NAME,
     logger: 'advanced-console',
-    entities: [__dirname + '/../**/*.model.js'],
+    entities: [process.cwd() + '/../**/*.model.js'],
     synchronize: NODE_ENV === 'production',
     connectorPackage: 'mysql2',
   }),
