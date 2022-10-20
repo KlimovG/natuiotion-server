@@ -22,6 +22,14 @@ export class UserResolver {
     return await this.customerService.findOne(id);
   }
 
+  @Query((returns) => UserModel)
+  async login(
+    @Args('email') email: string,
+    @Args('password') password: string,
+  ): Promise<UserModel> {
+    return await this.customerService.findByLogin({ email, password });
+  }
+
   @ResolveField((returns) => [RobotsModel])
   async robots(@Parent() robot: RobotsModel) {
     return this.robotsService.findByCustomer(robot.id);
