@@ -1,5 +1,6 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import {
+  BeforeInsert,
   Column,
   Entity,
   OneToMany,
@@ -7,6 +8,7 @@ import {
   Unique,
 } from 'typeorm';
 import { RobotsOfCustomersModel as Robots } from '../../robot/model/robots-of-customers.model';
+import { Md5 } from 'ts-md5';
 
 @ObjectType()
 @Entity('Customers')
@@ -35,4 +37,8 @@ export class UserModel {
   @Field((type) => [Robots], { nullable: true })
   @OneToMany((type) => Robots, (robot) => robot.user)
   robots: Robots[];
+
+  @BeforeInsert() hashPassword(): void {
+    this.password = Md5.hashStr(this.password);
+  }
 }
