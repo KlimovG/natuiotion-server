@@ -1,5 +1,12 @@
-import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
-import { UserModel } from '../model/user.model';
+import {
+  Args,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
+import { UserInput, UserModel } from '../model/user.model';
 import { Inject } from '@nestjs/common';
 import { UserService } from '../service/user.service';
 import { RobotsOfCustomersModel as RobotsModel } from '../../robot/model/robots-of-customers.model';
@@ -28,6 +35,11 @@ export class UserResolver {
     @Args('password') password: string,
   ): Promise<UserModel> {
     return await this.customerService.findByLogin({ email, password });
+  }
+
+  @Mutation((returns) => UserModel)
+  async createUser(@Args('data') data: UserInput): Promise<UserModel> {
+    return await this.customerService.create(data);
   }
 
   @ResolveField((returns) => [RobotsModel])

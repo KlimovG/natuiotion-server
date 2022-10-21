@@ -1,4 +1,4 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import {
   BeforeInsert,
   Column,
@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { RobotsOfCustomersModel as Robots } from '../../robot/model/robots-of-customers.model';
 import { Md5 } from 'ts-md5';
+import { IsEmail, IsNotEmpty, Length } from 'class-validator';
 
 @ObjectType()
 @Entity('Customers')
@@ -41,4 +42,39 @@ export class UserModel {
   @BeforeInsert() hashPassword(): void {
     this.password = Md5.hashStr(this.password);
   }
+}
+
+@InputType()
+export class UserInput {
+  @Field()
+  @Length(2, 255)
+  @IsNotEmpty()
+  name: string;
+
+  @Field()
+  @Length(2, 255)
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
+
+  @Field()
+  @Length(2, 20)
+  @IsNotEmpty()
+  phone: string;
+
+  @Field()
+  @Length(8, 255)
+  @IsNotEmpty()
+  password: string;
+}
+
+@InputType()
+export class UserLoginInput {
+  @Field()
+  @IsNotEmpty()
+  email: string;
+
+  @Field()
+  @IsNotEmpty()
+  password: string;
 }
