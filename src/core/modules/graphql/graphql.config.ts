@@ -5,5 +5,6 @@ export const graphqlConfig = [
   GraphQLModule.forRoot<ApolloDriverConfig>({
     driver: ApolloDriver,
     autoSchemaFile: 'schema.gql',
+    context: ({ req }) => ({ headers: req.headers }),
   }),
 ];
