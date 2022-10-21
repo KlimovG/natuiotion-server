@@ -1,6 +1,6 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Entity, OneToOne, PrimaryColumn } from 'typeorm';
-import { RobotsOfCustomersModel } from '../robots-of-customers.model';
+import { RobotsOfCustomersModel } from './robots-of-customers.model';
 
 @ObjectType()
 @Entity('Robots')

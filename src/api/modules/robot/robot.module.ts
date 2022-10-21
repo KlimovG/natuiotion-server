@@ -13,4 +13,4 @@ import { UserModule } from '../user/user.module';
   providers: [RobotsOfCustomersService, RobotsOfCustomersResolver],
   exports: [RobotsOfCustomersService],
 })
-export class RobotsOfCustomersModule {}
+export class RobotsModule {}
