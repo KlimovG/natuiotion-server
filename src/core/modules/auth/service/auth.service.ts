@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UserService } from '../../../../api/modules/user/service/user.service';
 import { JwtService } from '@nestjs/jwt';
-import { UserModel } from '../../../../api/modules/user/model/user.model';
+import { Md5 } from 'ts-md5';
+import { UserLoginInput } from '../../../../api/modules/user/model/user.model';
 
 @Injectable()
 export class AuthService {
@@ -23,10 +24,17 @@ export class AuthService {
     return null;
   }
 
-  async login({ email, id }: UserModel) {
-    const payload = { username: email, sub: id };
-    return {
-      access_token: this.jwtService.sign(payload),
-    };
+  async login({ email, password }: UserLoginInput) {
+    const user = await this.usersService.findByLogin({ email, password });
+
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.UNAUTHORIZED);
+    }
+
+    if (user.password !== Md5.hashStr(password)) {
+      throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
+    }
+
+    return this.jwtService.sign({ email, password });
   }
 }
