@@ -6,7 +6,7 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql';
-import { UserInput, UserModel } from '../model/user.model';
+import { UserInput, UserModel } from '../models/user.model';
 import { Inject } from '@nestjs/common';
 import { UserService } from '../service/user.service';
 import { RobotsOfCustomersModel as RobotsModel } from '../../robot/model/robots-of-customers.model';

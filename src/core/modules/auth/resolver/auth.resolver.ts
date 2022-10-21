@@ -2,7 +2,7 @@ import { Args, Query, Resolver } from '@nestjs/graphql';
 import {
   UserLoginInput,
   UserModel,
-} from '../../../../api/modules/user/model/user.model';
+} from '../../../../api/modules/user/models/user.model';
 import { AuthService } from '../service/auth.service';
 
 @Resolver((of) => UserModel)

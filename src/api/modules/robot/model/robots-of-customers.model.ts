@@ -6,7 +6,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { UserModel } from '../../user/model/user.model';
+import { UserModel } from '../../user/models/user.model';
 
 @ObjectType()
 @Entity('Robots_of_customers')

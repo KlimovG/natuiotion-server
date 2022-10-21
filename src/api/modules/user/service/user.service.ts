@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserInput, UserModel } from '../model/user.model';
+import { UserInput, UserModel } from '../models/user.model';
 import { Repository } from 'typeorm';
-import { UserLoginDto } from '../model/user-login.dto';
+import { UserLoginDto } from '../models/user-login.dto';
 import { Md5 } from 'ts-md5';
 
 @Injectable()

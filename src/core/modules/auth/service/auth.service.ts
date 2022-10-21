@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UserService } from '../../../../api/modules/user/service/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { Md5 } from 'ts-md5';
-import { UserLoginInput } from '../../../../api/modules/user/model/user.model';
+import { UserLoginInput } from '../../../../api/modules/user/models/user.model';
 
 @Injectable()
 export class AuthService {

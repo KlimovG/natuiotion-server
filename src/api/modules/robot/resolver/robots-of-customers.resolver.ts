@@ -2,7 +2,7 @@ import { RobotsOfCustomersModel } from '../model/robots-of-customers.model';
 import { Inject } from '@nestjs/common';
 import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { RobotsOfCustomersService } from '../service/robots-of-customers.service';
-import { UserModel } from '../../user/model/user.model';
+import { UserModel } from '../../user/models/user.model';
 import { UserService } from '../../user/service/user.service';
 
 @Resolver((of) => RobotsOfCustomersModel)
