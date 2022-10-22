@@ -3,12 +3,14 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Field, ObjectType } from '@nestjs/graphql';
 import { RobotsModel } from '../../robot/models/robots.model';
 import { VescStatisticModel } from './ves-statistic.model';
+import { ExtractedWeedsModel } from './extracted-weeds.model';
 
 @ObjectType()
 @Entity('Sessions')
@@ -33,6 +35,10 @@ export class SessionsModel {
   @ManyToOne(() => RobotsModel, (robot) => robot.serialNumber, { eager: true })
   @JoinColumn({ name: 'robot_serial_number' })
   robotSerialNumber: RobotsModel;
+
+  @Field(() => [ExtractedWeedsModel], { nullable: true })
+  @OneToMany(() => ExtractedWeedsModel, (extracted) => extracted.session)
+  extractedWeeds: ExtractedWeedsModel[];
 
   @Field()
   @Column({ name: 'field_id' })
