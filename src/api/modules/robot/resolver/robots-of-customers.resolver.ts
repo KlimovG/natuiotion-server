@@ -1,4 +1,4 @@
-import { RobotsOfCustomersModel } from '../model/robots-of-customers.model';
+import { RobotsOfCustomersModel } from '../models/robots-of-customers.model';
 import { Inject } from '@nestjs/common';
 import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { RobotsOfCustomersService } from '../service/robots-of-customers.service';

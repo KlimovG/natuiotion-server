@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
-import { RobotsOfCustomersModel as Robots } from '../../robot/model/robots-of-customers.model';
+import { RobotsOfCustomersModel as Robots } from '../../robot/models/robots-of-customers.model';
 import { Md5 } from 'ts-md5';
 import { IsEmail, IsNotEmpty, Length } from 'class-validator';
 

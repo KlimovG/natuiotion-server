@@ -9,7 +9,7 @@ import {
 import { UserInput, UserModel } from '../models/user.model';
 import { Inject } from '@nestjs/common';
 import { UserService } from '../service/user.service';
-import { RobotsOfCustomersModel as RobotsModel } from '../../robot/model/robots-of-customers.model';
+import { RobotsOfCustomersModel as RobotsModel } from '../../robot/models/robots-of-customers.model';
 import { RobotsOfCustomersService as RobotsService } from '../../robot/service/robots-of-customers.service';
 
 @Resolver((of) => UserModel)

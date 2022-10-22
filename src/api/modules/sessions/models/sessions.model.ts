@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Field, ObjectType } from '@nestjs/graphql';
-import { RobotsModel } from '../../robot/model/robots.model';
+import { RobotsModel } from '../../robot/models/robots.model';
 import { VescStatisticModel } from './ves-statistic.model';
 
 @ObjectType()

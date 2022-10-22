@@ -5,7 +5,7 @@ import { SessionsModel } from './models/sessions.model';
 import { SessionsResolver } from './resolver/sessions.resolver';
 import { SessionsService } from './service/sessions.service';
 import { VescStatisticModel } from './models/ves-statistic.model';
-import { WeedTypesModel } from '../robot/model/weed-types.model';
+import { WeedTypesModel } from '../robot/models/weed-types.model';
 
 @Module({
   imports: [
