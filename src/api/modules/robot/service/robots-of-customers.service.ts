@@ -21,7 +21,6 @@ export class RobotsOfCustomersService {
   findOne(id: number): Promise<RobotsOfCustomersModel> {
     return this.repository.findOne({
       where: { id },
-      relationLoadStrategy: 'join',
     });
   }
 
