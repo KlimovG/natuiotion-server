@@ -3,10 +3,12 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Field, ObjectType } from '@nestjs/graphql';
 import { RobotsModel } from '../../robot/model/robots.model';
+import { VescStatisticModel } from './ves-statistic.model';
 
 @ObjectType()
 @Entity('Sessions')
@@ -35,4 +37,8 @@ export class SessionsModel {
   @Field()
   @Column({ name: 'field_id' })
   fieldId: number;
+
+  @Field(() => VescStatisticModel, { nullable: true })
+  @OneToOne(() => VescStatisticModel, (vesc) => vesc.session)
+  statistic: VescStatisticModel;
 }

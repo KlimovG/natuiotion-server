@@ -1,9 +1,10 @@
-import { Query, Resolver } from '@nestjs/graphql';
+import { Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { SessionsService } from '../service/sessions.service';
 import { Inject } from '@nestjs/common';
 import { SessionsModel } from '../models/sessions.model';
+import { VescStatisticModel } from '../models/ves-statistic.model';
 
-@Resolver()
+@Resolver(() => SessionsModel)
 export class SessionsResolver {
   constructor(
     @Inject(SessionsService)
@@ -12,5 +13,10 @@ export class SessionsResolver {
   @Query((returns) => [SessionsModel])
   async getAllSessions(): Promise<SessionsModel[]> {
     return await this.service.findAll();
+  }
+
+  @ResolveField(() => VescStatisticModel)
+  async statistic(@Parent() session: SessionsModel) {
+    return this.service.getVescStatistic(session.id);
   }
 }

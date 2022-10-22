@@ -3,12 +3,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { SessionsModel } from '../models/sessions.model';
 import { Repository } from 'typeorm';
 import { BaseService } from '../../../../utils/base-models';
+import { VescStatisticModel } from '../models/ves-statistic.model';
 
 @Injectable()
 export class SessionsService implements BaseService<SessionsModel> {
   constructor(
     @InjectRepository(SessionsModel)
-    private repository: Repository<SessionsModel>,
+    private sessionRepo: Repository<SessionsModel>,
+    @InjectRepository(VescStatisticModel)
+    private vescRepo: Repository<VescStatisticModel>,
   ) {}
 
   // create(input: any): Promise<SessionsModel> {
@@ -16,10 +19,14 @@ export class SessionsService implements BaseService<SessionsModel> {
   // }
 
   findAll(): Promise<SessionsModel[]> {
-    return this.repository.find();
+    return this.sessionRepo.find();
   }
 
   findOne(id: number): Promise<SessionsModel> {
-    return this.repository.findOneBy({ id });
+    return this.sessionRepo.findOneBy({ id });
+  }
+
+  getVescStatistic(id: number): Promise<VescStatisticModel> {
+    return this.vescRepo.findOne({ where: { sessionId: id } });
   }
 }
