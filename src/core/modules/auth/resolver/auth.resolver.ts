@@ -1,16 +1,24 @@
-import { Args, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
   UserLoginInput,
+  UserLoginOutput,
   UserModel,
+  UserVerifyInput,
 } from '../../../../api/modules/user/models/user.model';
 import { AuthService } from '../service/auth.service';
+import any = jasmine.any;
 
 @Resolver((of) => UserModel)
 export class AuthResolver {
   constructor(private service: AuthService) {}
 
-  @Query((returns) => String)
-  async login(@Args('input') input: UserLoginInput) {
+  @Mutation((returns) => UserLoginOutput)
+  async login(@Args('input') input: UserLoginInput): Promise<UserLoginOutput> {
     return this.service.login(input);
+  }
+
+  @Mutation((returns) => Boolean)
+  async validate(@Args('input') input: UserVerifyInput): Promise<boolean> {
+    return this.service.validateUser(input);
   }
 }

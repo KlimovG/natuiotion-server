@@ -78,3 +78,23 @@ export class UserLoginInput {
   @IsNotEmpty()
   password: string;
 }
+
+@InputType()
+export class UserVerifyInput {
+  @Field()
+  @IsNotEmpty()
+  email: string;
+
+  @Field()
+  @IsNotEmpty()
+  token: string;
+}
+
+@ObjectType()
+export class UserLoginOutput {
+  @Field()
+  token: string;
+
+  @Field()
+  email: string;
+}

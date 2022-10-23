@@ -2,7 +2,10 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UserService } from '../../../../api/modules/user/service/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { Md5 } from 'ts-md5';
-import { UserLoginInput } from '../../../../api/modules/user/models/user.model';
+import {
+  UserLoginInput,
+  UserLoginOutput,
+} from '../../../../api/modules/user/models/user.model';
 
 @Injectable()
 export class AuthService {
@@ -11,21 +14,35 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async validateUser(email: string, password: string): Promise<any> {
+  async validateUser(input: UserLoginOutput): Promise<boolean> {
+    // const user = await this.usersService.findByLoginAndPassword(
+    //   email,
+    //   password,
+    // );
+    //
+    // if (user && user.password === password) {
+    //   const { password, ...result } = user;
+    //   return result;
+    // }
+    const { email, token } = input;
+    const user = await this.usersService.findByLogin(email);
+    try {
+      const validToken = this.jwtService.verify(token);
+      console.log(validToken);
+    } catch (e) {
+      console.log(e);
+    }
+    // if (validToken.email === email) {
+    //   return true;
+    // }
+    return false;
+  }
+
+  async login({ email, password }: UserLoginInput): Promise<UserLoginOutput> {
     const user = await this.usersService.findByLoginAndPassword(
       email,
       password,
     );
-
-    if (user && user.password === password) {
-      const { password, ...result } = user;
-      return result;
-    }
-    return null;
-  }
-
-  async login({ email, password }: UserLoginInput) {
-    const user = await this.usersService.findByLogin({ email, password });
 
     if (!user) {
       throw new HttpException('User not found', HttpStatus.UNAUTHORIZED);
@@ -35,6 +52,9 @@ export class AuthService {
       throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
     }
 
-    return this.jwtService.sign({ email, password });
+    return {
+      token: this.jwtService.sign({ email, password }),
+      email: user.email,
+    };
   }
 }

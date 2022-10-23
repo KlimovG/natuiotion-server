@@ -25,14 +25,14 @@ export class UserService {
     return this.repository.findOneBy({ id });
   }
 
-  async findByLogin({ email, password }: UserLoginDto): Promise<UserModel> {
+  async findByLogin(email: string): Promise<UserModel> {
     return await this.repository.findOneBy({ email });
   }
 
   findByLoginAndPassword(login: string, password: string): Promise<UserModel> {
     return this.repository.findOneBy({
       email: login,
-      password: password,
+      password: Md5.hashStr(password),
     });
   }
 }

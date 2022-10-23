@@ -29,13 +29,13 @@ export class UserResolver {
     return await this.customerService.findOne(id);
   }
 
-  @Query((returns) => UserModel)
-  async login(
-    @Args('email') email: string,
-    @Args('password') password: string,
-  ): Promise<UserModel> {
-    return await this.customerService.findByLogin({ email, password });
-  }
+  // @Mutation((returns) => UserModel)
+  // async login(
+  //   @Args('email') email: string,
+  //   @Args('password') password: string,
+  // ): Promise<UserModel> {
+  //   return await this.customerService.findByLogin({ email, password });
+  // }
 
   @Mutation((returns) => UserModel)
   async createUser(@Args('data') data: UserInput): Promise<UserModel> {
