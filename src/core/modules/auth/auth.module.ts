@@ -6,6 +6,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AuthResolver } from './resolver/auth.resolver';
 import { ConfigService } from '@nestjs/config';
+import { LocalStrategy } from './strategies/local.strategy';
 
 @Module({
   imports: [
@@ -17,19 +18,13 @@ import { ConfigService } from '@nestjs/config';
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
         signOptions: {
-          expiresIn: `${configService.get<number>('JWT_EXPIRATION')}`,
+          expiresIn: `${configService.get<number>('JWT_EXPIRATION')}s`,
         },
       }),
       inject: [ConfigService],
     }),
-    // JwtModule.register({
-    //   secret: 'hui',
-    //   signOptions: {
-    //     expiresIn: '60s',
-    //   },
-    // }),
   ],
-  providers: [AuthService, JwtStrategy, AuthResolver],
+  providers: [AuthService, JwtStrategy, AuthResolver, LocalStrategy],
   exports: [AuthService],
 })
 export class AuthModule {}

@@ -1,15 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserInput, UserModel } from '../models/user.model';
 import { Repository } from 'typeorm';
-import { UserLoginDto } from '../models/user-login.dto';
 import { Md5 } from 'ts-md5';
+import { UserMapper } from './user.mapper';
+import { UserDto } from '../models/user.dto';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(UserModel)
     private repository: Repository<UserModel>,
+    private mapper: UserMapper,
   ) {}
 
   async create(input: UserInput): Promise<UserModel> {
@@ -34,5 +36,15 @@ export class UserService {
       email: login,
       password: Md5.hashStr(password),
     });
+  }
+  async validateUser(email: string, password: string): Promise<UserDto> {
+    const user = await this.findByLogin(email);
+    const isPasswordValid = Md5.hashStr(password) === user.password;
+
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Credentials are not valid');
+    }
+
+    return this.mapper.toUserDto(user);
   }
 }
