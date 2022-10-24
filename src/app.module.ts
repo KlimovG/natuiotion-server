@@ -4,7 +4,7 @@ import { AppService } from './app.service';
 import { ApiModule } from './api/api.module';
 import { CoreModule } from './core/core.module';
 import { ConfigModule } from '@nestjs/config';
-import Joi from 'joi';
+import * as Joi from 'joi';
 
 @Module({
   imports: [

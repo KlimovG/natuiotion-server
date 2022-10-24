@@ -95,6 +95,6 @@ export class UserLoginOutput {
   @Field()
   token: string;
 
-  @Field()
-  email: string;
+  @Field(() => UserModel)
+  user: UserModel;
 }

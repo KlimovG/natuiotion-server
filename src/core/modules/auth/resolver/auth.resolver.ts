@@ -12,8 +12,8 @@ import any = jasmine.any;
 export class AuthResolver {
   constructor(private service: AuthService) {}
 
-  @Mutation((returns) => UserLoginOutput)
-  async login(@Args('input') input: UserLoginInput): Promise<UserLoginOutput> {
+  @Mutation((returns) => UserModel)
+  async login(@Args('input') input: UserLoginInput): Promise<UserModel> {
     return this.service.login(input);
   }
 

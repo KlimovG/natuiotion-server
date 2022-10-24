@@ -1,11 +1,18 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UserService } from '../../../../api/modules/user/service/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { Md5 } from 'ts-md5';
 import {
   UserLoginInput,
   UserLoginOutput,
+  UserModel,
 } from '../../../../api/modules/user/models/user.model';
+import { use } from 'passport';
 
 @Injectable()
 export class AuthService {
@@ -14,31 +21,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async validateUser(input: UserLoginOutput): Promise<boolean> {
-    // const user = await this.usersService.findByLoginAndPassword(
-    //   email,
-    //   password,
-    // );
-    //
-    // if (user && user.password === password) {
-    //   const { password, ...result } = user;
-    //   return result;
-    // }
-    const { email, token } = input;
-    const user = await this.usersService.findByLogin(email);
-    try {
-      const validToken = this.jwtService.verify(token);
-      console.log(validToken);
-    } catch (e) {
-      console.log(e);
-    }
-    // if (validToken.email === email) {
-    //   return true;
-    // }
-    return false;
-  }
-
-  async login({ email, password }: UserLoginInput): Promise<UserLoginOutput> {
+  async validateUser({ email, password }: UserLoginInput): Promise<UserModel> {
     const user = await this.usersService.findByLoginAndPassword(
       email,
       password,
@@ -49,12 +32,19 @@ export class AuthService {
     }
 
     if (user.password !== Md5.hashStr(password)) {
-      throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
+      throw new UnauthorizedException({ message: 'Invalid credentials' });
     }
 
-    return {
-      token: this.jwtService.sign({ email, password }),
-      email: user.email,
-    };
+    return user;
+  }
+
+  async login({ email, password }: UserLoginInput): Promise<UserLoginOutput> {
+    const user = await this.validateUser({ email, password });
+    return { token: this.generateToken(user), user };
+  }
+
+  private generateToken({ name, email, id }: UserModel): string {
+    const payload = { username: name, email: email, id: id };
+    return this.jwtService.sign(payload);
   }
 }
