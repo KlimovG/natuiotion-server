@@ -9,16 +9,24 @@ import { JwtService } from '@nestjs/jwt';
 import { Md5 } from 'ts-md5';
 import {
   UserLoginInput,
-  UserLoginOutput,
   UserModel,
 } from '../../../../api/modules/user/models/user.model';
-import { use } from 'passport';
+import { ConfigService } from '@nestjs/config';
+import { Response } from 'express';
+import { UserDto } from '../../../../api/modules/user/models/user.dto';
+
+export interface TokenPayload {
+  username: string;
+  email: string;
+  id: number;
+}
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UserService,
     private jwtService: JwtService,
+    private configService: ConfigService,
   ) {}
 
   async validateUser({ email, password }: UserLoginInput): Promise<UserModel> {
@@ -38,13 +46,28 @@ export class AuthService {
     return user;
   }
 
-  async login({ email, password }: UserLoginInput): Promise<UserLoginOutput> {
-    const user = await this.validateUser({ email, password });
-    return { token: this.generateToken(user), user };
-  }
+  async login(user: UserDto, response: Response) {
+    const tokenPayload = this.generateTokenPayload(user);
 
-  private generateToken({ name, email, id }: UserModel): string {
-    const payload = { username: name, email: email, id: id };
-    return this.jwtService.sign(payload);
+    const expires = new Date();
+    expires.setSeconds(
+      expires.getSeconds() + this.configService.get('JWT_EXPIRATION'),
+    );
+
+    const token = this.jwtService.sign(tokenPayload);
+
+    response.cookie('Authentication', token, {
+      httpOnly: true,
+      expires,
+    });
+  }
+  //
+  // async login({ email, password }: UserLoginInput): Promise<UserLoginOutput> {
+  //   const user = await this.validateUser({ email, password });
+  //   return { token: this.generateToken(user), user };
+  // }
+
+  private generateTokenPayload(user: UserDto): TokenPayload {
+    return { username: user.name, email: user.email, id: user.id };
   }
 }
