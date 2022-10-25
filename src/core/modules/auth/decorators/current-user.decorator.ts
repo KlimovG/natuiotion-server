@@ -1,6 +1,6 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import { UserLoginInput } from '../../../../api/modules/user/models/user.model';
 import { GqlExecutionContext } from '@nestjs/graphql';
+import { UserLoginInput } from '../../../../api/modules/user/dto/input/user-login-input.dto';
 
 export const getCurrentUserByContext = (
   context: ExecutionContext,

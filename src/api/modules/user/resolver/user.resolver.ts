@@ -6,11 +6,15 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql';
-import { UserInput, UserModel } from '../models/user.model';
-import { Inject } from '@nestjs/common';
+import { UserModel } from '../models/user.model';
+import { Inject, UseGuards } from '@nestjs/common';
 import { UserService } from '../service/user.service';
 import { RobotsOfCustomersModel as RobotsModel } from '../../robot/models/robots-of-customers.model';
 import { RobotsOfCustomersService as RobotsService } from '../../robot/service/robots-of-customers.service';
+import { GqlAuthGuard } from '../../../../core/modules/auth/guards/gql-auth.guard';
+import { GetUserArgs } from '../dto/args/get-user-args.dto';
+import { UserDto } from '../dto/user.dto';
+import { UserRegistrationInput } from '../dto/input/user-reg-input.dto';
 
 @Resolver((of) => UserModel)
 export class UserResolver {
@@ -19,26 +23,22 @@ export class UserResolver {
     private robotsService: RobotsService,
   ) {}
 
+  @UseGuards(GqlAuthGuard)
   @Query((returns) => [UserModel])
   async customers(): Promise<UserModel[]> {
     return await this.customerService.findAll();
   }
 
-  @Query((returns) => UserModel)
-  async customer(@Args('id') id: number): Promise<UserModel> {
-    return await this.customerService.findOne(id);
+  @UseGuards(GqlAuthGuard)
+  @Query((returns) => UserDto)
+  async customer(@Args() user: GetUserArgs): Promise<UserDto> {
+    return await this.customerService.getUser(user.email);
   }
 
-  // @Mutation((returns) => UserModel)
-  // async login(
-  //   @Args('email') email: string,
-  //   @Args('password') password: string,
-  // ): Promise<UserModel> {
-  //   return await this.customerService.findByLogin({ email, password });
-  // }
-
   @Mutation((returns) => UserModel)
-  async createUser(@Args('data') data: UserInput): Promise<UserModel> {
+  async createUser(
+    @Args('data') data: UserRegistrationInput,
+  ): Promise<UserModel> {
     return await this.customerService.create(data);
   }
 

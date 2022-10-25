@@ -3,11 +3,12 @@ import { LocalAuthGuard } from '../guards/local-auth.guard';
 import { CurrentUser } from '../decorators/current-user.decorator';
 import { AuthService } from '../service/auth.service';
 import { Response } from 'express';
-import { UserDto } from '../../../../api/modules/user/models/user.dto';
+import { UserDto } from '../../../../api/modules/user/dto/user.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(
@@ -15,5 +16,6 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
   ) {
     await this.authService.login(user, response);
+    response.send(user);
   }
 }
