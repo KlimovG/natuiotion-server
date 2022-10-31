@@ -9,6 +9,7 @@ export const getCurrentUserByContext = (
     return context.switchToHttp().getRequest().user;
   }
   const ctx = GqlExecutionContext.create(context);
+  console.log('getCurrentUserByContext', ctx.getContext().req);
   return ctx.getContext().req.user;
 };
 

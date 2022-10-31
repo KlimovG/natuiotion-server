@@ -6,7 +6,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { SessionsModel } from './sessions.model';
+import { SessionsModel } from '../../sessions/models/sessions.model';
 
 @ObjectType()
 @Entity('Extracted_weeds')
@@ -20,9 +20,12 @@ export class ExtractedWeedsModel {
   pointPath: number;
 
   @Field()
-  @ManyToOne(() => SessionsModel, (session) => session.id)
+  @Column({ name: 'session_id' })
+  sessionId: number;
+
+  @ManyToOne(() => SessionsModel, (session) => session.id, { eager: true })
   @JoinColumn({ name: 'session_id' })
-  session: number;
+  session: SessionsModel;
 
   @Field()
   @Column({ name: 'weed_type_id' })

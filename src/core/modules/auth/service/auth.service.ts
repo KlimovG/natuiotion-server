@@ -27,12 +27,30 @@ export class AuthService {
       expires.getSeconds() + this.configService.get('JWT_EXPIRATION'),
     );
 
-    const token = this.jwtService.sign(tokenPayload);
+    const token = this.jwtService.signAsync(tokenPayload);
 
     response.cookie('Authentication', token, {
       httpOnly: true,
       expires,
     });
+  }
+
+  async getTokens(user: UserDto) {
+    const payload = this.generateTokenPayload(user);
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAsync(payload, {
+        secret: this.configService.get<string>('JWT_SECRET'),
+        expiresIn: this.configService.get<string>('JWT_SECRET_EXPIRATION'),
+      }),
+      this.jwtService.signAsync(payload, {
+        secret: this.configService.get<string>('JWT_REFRESH'),
+        expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRATION'),
+      }),
+    ]);
+    return {
+      accessToken,
+      refreshToken,
+    };
   }
 
   private generateTokenPayload(user: UserDto): TokenPayload {

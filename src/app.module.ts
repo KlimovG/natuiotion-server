@@ -15,7 +15,9 @@ import * as Joi from 'joi';
       validationSchema: Joi.object({
         PORT: Joi.number().required(),
         JWT_SECRET: Joi.string().required(),
-        JWT_EXPIRATION: Joi.number().required(),
+        JWT_SECRET_EXPIRATION: Joi.number().required(),
+        JWT_REFRESH: Joi.string().required(),
+        JWT_REFRESH_EXPIRATION: Joi.number().required(),
       }),
     }),
   ],

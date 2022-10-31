@@ -9,8 +9,8 @@ import {
 } from 'typeorm';
 import { Field, ObjectType } from '@nestjs/graphql';
 import { RobotsModel } from '../../robot/models/robots.model';
-import { VescStatisticModel } from './ves-statistic.model';
-import { ExtractedWeedsModel } from './extracted-weeds.model';
+import { VescStatisticModel } from '../../statistic/models/ves-statistic.model';
+import { ExtractedWeedsModel } from '../../statistic/models/extracted-weeds.model';
 
 @ObjectType()
 @Entity('Sessions')

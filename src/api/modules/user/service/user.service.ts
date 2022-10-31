@@ -49,7 +49,6 @@ export class UserService {
   async validateUser(email: string, password: string): Promise<UserDto> {
     const user = await this.findByLogin(email);
     const isPasswordValid = Md5.hashStr(password) === user.password;
-
     if (!isPasswordValid) {
       throw new UnauthorizedException('Credentials are not valid');
     }

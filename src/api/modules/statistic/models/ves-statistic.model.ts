@@ -6,7 +6,7 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { SessionsModel } from './sessions.model';
+import { SessionsModel } from '../../sessions/models/sessions.model';
 
 @ObjectType()
 @Entity('Vesc_statistics')
