@@ -1,16 +1,16 @@
 import { forwardRef, Module } from '@nestjs/common';
-import { RobotsOfCustomersModel } from './models/robots-of-customers.model';
+import { RobotModel } from './models/robot.model';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { RobotsOfCustomersService } from './service/robots-of-customers.service';
-import { RobotsOfCustomersResolver } from './resolver/robots-of-customers.resolver';
+import { RobotsService } from './service/robots.service';
+import { RobotsResolver } from './resolver/robots.resolver';
 import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
     forwardRef(() => UserModule),
-    TypeOrmModule.forFeature([RobotsOfCustomersModel]),
+    TypeOrmModule.forFeature([RobotModel]),
   ],
-  providers: [RobotsOfCustomersService, RobotsOfCustomersResolver],
-  exports: [RobotsOfCustomersService],
+  providers: [RobotsService, RobotsResolver],
+  exports: [RobotsService],
 })
 export class RobotsModule {}

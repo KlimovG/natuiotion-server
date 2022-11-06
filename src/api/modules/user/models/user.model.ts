@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
-import { RobotsOfCustomersModel as Robots } from '../../robot/models/robots-of-customers.model';
+// import { RobotModel as Robots } from '../../robot/models/robot.model';
 import { Md5 } from 'ts-md5';
 
 @ObjectType()
@@ -34,9 +34,9 @@ export class UserModel {
   @Column({ name: 'hash_pwd', length: 20, nullable: false })
   password: string;
 
-  @Field((type) => [Robots], { nullable: true })
-  @OneToMany((type) => Robots, (robot) => robot.user)
-  robots: Robots[];
+  // @Field((type) => [Robots], { nullable: true })
+  // @OneToMany((type) => Robots, (robot) => robot.user)
+  // robots: Robots[];
 
   @BeforeInsert() hashPassword(): void {
     this.password = Md5.hashStr(this.password);

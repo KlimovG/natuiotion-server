@@ -8,7 +8,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Field, ObjectType } from '@nestjs/graphql';
-import { RobotsModel } from '../../robot/models/robots.model';
+import { RobotNumberModel } from '../../robot/models/robot-number.model';
 import { VescStatisticModel } from '../../statistic/models/ves-statistic.model';
 import { ExtractedWeedsModel } from '../../statistic/models/extracted-weeds.model';
 
@@ -32,9 +32,11 @@ export class SessionsModel {
   prevSessionId: number;
 
   @Field()
-  @ManyToOne(() => RobotsModel, (robot) => robot.serialNumber, { eager: true })
+  @ManyToOne(() => RobotNumberModel, (robot) => robot.serialNumber, {
+    eager: true,
+  })
   @JoinColumn({ name: 'robot_serial_number' })
-  robotSerialNumber: RobotsModel;
+  robotSerialNumber: RobotNumberModel;
 
   @Field(() => [ExtractedWeedsModel], { nullable: true })
   @OneToMany(() => ExtractedWeedsModel, (extracted) => extracted.session)

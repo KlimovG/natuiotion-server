@@ -13,5 +13,6 @@ import { StatisticModule } from '../statistic/statistic.module';
     TypeOrmModule.forFeature([SessionsModel]),
   ],
   providers: [SessionsResolver, SessionsService],
+  exports: [SessionsService],
 })
 export class SessionsModule {}

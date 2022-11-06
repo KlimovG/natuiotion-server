@@ -9,8 +9,8 @@ import {
 import { UserModel } from '../models/user.model';
 import { Inject, UseGuards } from '@nestjs/common';
 import { UserService } from '../service/user.service';
-import { RobotsOfCustomersModel as RobotsModel } from '../../robot/models/robots-of-customers.model';
-import { RobotsOfCustomersService as RobotsService } from '../../robot/service/robots-of-customers.service';
+import { RobotModel as RobotsModel } from '../../robot/models/robot.model';
+import { RobotsService as RobotsService } from '../../robot/service/robots.service';
 import { GqlAuthGuard } from '../../../../core/modules/auth/guards/gql-auth.guard';
 import { GetUserArgs } from '../dto/args/get-user-args.dto';
 import { UserDto } from '../dto/user.dto';
@@ -42,7 +42,7 @@ export class UserResolver {
     return await this.customerService.create(data);
   }
 
-  @ResolveField((returns) => [RobotsModel])
+  @ResolveField('robots', (returns) => [RobotsModel])
   async robots(@Parent() robot: RobotsModel) {
     return this.robotsService.findByCustomer(robot.id);
   }

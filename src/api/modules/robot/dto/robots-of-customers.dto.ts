@@ -1,3 +1,3 @@
-export interface RobotsOfCustomersDto {
-  id: number;
-}
+// export interface RobotsOfCustomersDto {
+//   id: number;
+// }

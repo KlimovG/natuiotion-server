@@ -1,12 +1,14 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
 import {
   Column,
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { SessionsModel } from '../../sessions/models/sessions.model';
+import { WeedTypesModel } from './weed-types.model';
 
 @ObjectType()
 @Entity('Extracted_weeds')
@@ -27,7 +29,21 @@ export class ExtractedWeedsModel {
   @JoinColumn({ name: 'session_id' })
   session: SessionsModel;
 
-  @Field()
-  @Column({ name: 'weed_type_id' })
-  weedType: number;
+  // @Column({ name: 'weed_type_id' })
+  @Field((type) => WeedTypesModel)
+  @OneToOne((type) => WeedTypesModel, (weed) => weed.id, { eager: true })
+  @JoinColumn({ name: 'weed_type_id' })
+  weedType: WeedTypesModel;
 }
+
+export enum WeedTypes {
+  'Plantain' = 1,
+  'Daisy',
+  'Porcelle',
+  'Dandelion',
+}
+
+registerEnumType(WeedTypes, {
+  name: 'WeedTypes',
+  description: 'The weed types.',
+});

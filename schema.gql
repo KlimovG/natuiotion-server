@@ -1,0 +1,129 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type UserModel {
+  id: Float!
+  name: String!
+  email: String!
+  phone: String!
+  password: String!
+  robots: [RobotModel!]!
+}
+
+type RobotModel {
+  id: Float!
+  userId: Float!
+  robotSerialNumber: String!
+  customer: UserModel!
+}
+
+type UserDto {
+  id: Float!
+  name: String!
+  email: String!
+  phone: String!
+}
+
+type RobotNumberModel {
+  serialNumber: String!
+}
+
+type VescStatisticModel {
+  id: Float!
+  sessionId: Float!
+  session: SessionsModel!
+  voltage: Float!
+  timestamp: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type WeedTypesModel {
+  id: Float!
+  label: String!
+}
+
+type ExtractedWeedsModel {
+  id: Float!
+  pointPath: Float!
+  sessionId: Float!
+  weedType: WeedTypesModel!
+}
+
+type SessionsModel {
+  id: Float!
+  startTime: DateTime!
+  endTime: DateTime!
+  prevSessionId: Float
+  robotSerialNumber: RobotNumberModel!
+  extractedWeeds: [ExtractedWeedsModel!]
+  fieldId: Float!
+  statistic: VescStatisticModel
+}
+
+type DurationType {
+  years: Float!
+  quarters: Float!
+  months: Float!
+  weeks: Float!
+  days: Float!
+  hours: Float!
+  minutes: Float!
+  seconds: Float!
+  milliseconds: Float!
+}
+
+type ChartDataDto {
+  labels: [String!]!
+  data: [Float!]!
+}
+
+type StatisticDto {
+  voltage: Float!
+  duration: DurationType!
+  totalNumber: Float!
+  chart: ChartDataDto
+}
+
+type RobotsOfCustomersModel {
+  id: Float!
+  customerId: Float!
+  customer: CustomerModel
+  robotSerialNumber: String!
+}
+
+type CustomerModel {
+  id: Float!
+  name: String!
+  email: String!
+  phone: String!
+  hashPWD: String!
+  robots: [RobotsOfCustomersModel!]
+}
+
+type Query {
+  customers: [UserModel!]!
+  customer(id: Float!, name: String!, email: String!, phone: String!): UserDto!
+  getOneRobotWithCustomer(id: Float!): RobotModel!
+  getRobotsByCustomer(id: Float!): [RobotModel!]!
+  getAllRobotsWithCustomers: [RobotModel!]!
+  getAllSessions: [SessionsModel!]!
+  getSessionsForRobot(serial: String!): [SessionsModel!]!
+  getStatisticForSession(session: Float!): VescStatisticModel!
+  getRobotStats(session: Float!): StatisticDto!
+}
+
+type Mutation {
+  createUser(data: UserRegistrationInput!): UserModel!
+}
+
+input UserRegistrationInput {
+  name: String!
+  email: String!
+  phone: String!
+  password: String!
+}

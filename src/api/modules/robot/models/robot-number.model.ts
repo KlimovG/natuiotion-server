@@ -1,15 +1,15 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Entity, OneToOne, PrimaryColumn } from 'typeorm';
-import { RobotsOfCustomersModel } from './robots-of-customers.model';
+import { RobotModel } from './robot.model';
 
 @ObjectType()
 @Entity('Robots')
-export class RobotsModel {
+export class RobotNumberModel {
   @Field()
   @PrimaryColumn({ name: 'serial_number', length: 5, nullable: false })
   @OneToOne(
-    (type) => RobotsOfCustomersModel,
-    (robots: RobotsOfCustomersModel) => robots.robotSerialNumber,
+    (type) => RobotModel,
+    (robots: RobotModel) => robots.robotSerialNumber,
   )
   serialNumber: string;
 }
