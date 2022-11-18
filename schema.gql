@@ -8,14 +8,6 @@ type UserModel {
   email: String!
   phone: String!
   password: String!
-  robots: [RobotModel!]!
-}
-
-type RobotModel {
-  id: Float!
-  userId: Float!
-  robotSerialNumber: String!
-  customer: UserModel!
 }
 
 type UserDto {
@@ -25,8 +17,8 @@ type UserDto {
   phone: String!
 }
 
-type RobotNumberModel {
-  serialNumber: String!
+type RobotModel {
+  serial: String!
 }
 
 type VescStatisticModel {
@@ -59,7 +51,7 @@ type SessionsModel {
   startTime: DateTime!
   endTime: DateTime!
   prevSessionId: Float
-  robotSerialNumber: RobotNumberModel!
+  robotSerialNumber: RobotModel!
   extractedWeeds: [ExtractedWeedsModel!]
   fieldId: Float!
   statistic: VescStatisticModel
@@ -108,8 +100,6 @@ type CustomerModel {
 type Query {
   customers: [UserModel!]!
   customer(id: Float!, name: String!, email: String!, phone: String!): UserDto!
-  getOneRobotWithCustomer(id: Float!): RobotModel!
-  getRobotsByCustomer(id: Float!): [RobotModel!]!
   getAllRobotsWithCustomers: [RobotModel!]!
   getAllSessions: [SessionsModel!]!
   getSessionsForRobot(serial: String!): [SessionsModel!]!

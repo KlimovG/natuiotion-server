@@ -13,24 +13,24 @@ export class RobotsResolver {
     @Inject(UserService) private customerService: UserService,
   ) {}
 
-  @Query((returns) => RobotModel)
-  async getOneRobotWithCustomer(@Args('id') id: number): Promise<RobotModel> {
-    return await this.robotService.findOne(id);
-  }
-
-  @Query((returns) => [RobotModel])
-  async getRobotsByCustomer(@Args('id') id: number): Promise<RobotModel[]> {
-    return await this.robotService.findByCustomer(id);
-  }
+  // @Query((returns) => RobotModel)
+  // async getOneRobotWithCustomer(@Args('id') id: number): Promise<RobotModel> {
+  //   return await this.robotService.findOne(id);
+  // }
+  //
+  // @Query((returns) => [RobotModel])
+  // async getRobotsByCustomer(@Args('id') id: number): Promise<RobotModel[]> {
+  //   return await this.robotService.findByCustomer(id);
+  // }
 
   @Query((returns) => [RobotModel])
   async getAllRobotsWithCustomers(): Promise<RobotModel[]> {
     return await this.robotService.findAll();
   }
-
-  @ResolveField('customer', () => UserModel)
-  async getCustomer(@Parent() robot: RobotModel) {
-    const { userId } = robot;
-    return await this.customerService.findOne(userId);
-  }
+  //
+  // @ResolveField('customer', () => UserModel)
+  // async getCustomer(@Parent() robot: RobotModel) {
+  //   const { userId } = robot;
+  //   return await this.customerService.findOne(userId);
+  // }
 }

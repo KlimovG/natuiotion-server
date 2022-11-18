@@ -41,9 +41,9 @@ export class UserResolver {
   ): Promise<UserModel> {
     return await this.customerService.create(data);
   }
-
-  @ResolveField('robots', (returns) => [RobotsModel])
-  async robots(@Parent() robot: RobotsModel) {
-    return this.robotsService.findByCustomer(robot.id);
-  }
+  //
+  // @ResolveField('robots', (returns) => [RobotsModel])
+  // async robots(@Parent() robot: RobotsModel) {
+  //   return this.robotsService.findByCustomer(robot.id);
+  // }
 }
