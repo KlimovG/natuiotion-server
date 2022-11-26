@@ -12,10 +12,6 @@ async function bootstrap() {
   app.use(cookieParser());
   app.enableCors({
     credentials: true,
-    // origin: [
-    //   'http://localhost:4200',
-    //   'https://studio.apollographql.com/sandbox/explorer',
-    // ],
   });
   app.useGlobalPipes(new ValidationPipe());
   await app

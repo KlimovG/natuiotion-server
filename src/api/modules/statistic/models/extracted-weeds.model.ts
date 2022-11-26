@@ -29,7 +29,6 @@ export class ExtractedWeedsModel {
   @JoinColumn({ name: 'session_id' })
   session: SessionsModel;
 
-  // @Column({ name: 'weed_type_id' })
   @Field((type) => WeedTypesModel)
   @OneToOne((type) => WeedTypesModel, (weed) => weed.id, { eager: true })
   @JoinColumn({ name: 'weed_type_id' })

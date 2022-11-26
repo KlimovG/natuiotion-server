@@ -11,10 +11,6 @@ export class SessionsService implements BaseService<SessionsModel> {
     private sessionRepo: Repository<SessionsModel>,
   ) {}
 
-  // create(input: any): Promise<SessionsModel> {
-  //   return Promise.resolve(undefined);
-  // }
-
   findAll(): Promise<SessionsModel[]> {
     return this.sessionRepo.find();
   }

@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {Injectable, Logger, UnauthorizedException} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserModel } from '../models/user.model';
 import { Repository } from 'typeorm';
@@ -9,6 +9,7 @@ import { UserRegistrationInput } from '../dto/input/user-reg-input.dto';
 
 @Injectable()
 export class UserService {
+  private readonly logger = new Logger('User');
   constructor(
     @InjectRepository(UserModel)
     private repository: Repository<UserModel>,
@@ -21,11 +22,8 @@ export class UserService {
   }
 
   findAll(): Promise<UserModel[]> {
+    this.logger.log('Getting all users')
     return this.repository.find();
-  }
-
-  findOne(id: number): Promise<UserModel> {
-    return this.repository.findOneBy({ id });
   }
 
   async getUser(email: string): Promise<UserDto> {
@@ -37,15 +35,6 @@ export class UserService {
     return await this.repository.findOneBy({ email });
   }
 
-  async findByLoginAndPassword(
-    login: string,
-    password: string,
-  ): Promise<UserModel> {
-    return await this.repository.findOneBy({
-      email: login,
-      password: Md5.hashStr(password),
-    });
-  }
   async validateUser(email: string, password: string): Promise<UserDto> {
     const user = await this.findByLogin(email);
     const isPasswordValid = Md5.hashStr(password) === user.password;

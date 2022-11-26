@@ -81,22 +81,6 @@ type StatisticDto {
   chart: ChartDataDto
 }
 
-type RobotsOfCustomersModel {
-  id: Float!
-  customerId: Float!
-  customer: CustomerModel
-  robotSerialNumber: String!
-}
-
-type CustomerModel {
-  id: Float!
-  name: String!
-  email: String!
-  phone: String!
-  hashPWD: String!
-  robots: [RobotsOfCustomersModel!]
-}
-
 type Query {
   customers: [UserModel!]!
   customer(id: Float!, name: String!, email: String!, phone: String!): UserDto!

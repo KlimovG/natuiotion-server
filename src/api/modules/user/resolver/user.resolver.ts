@@ -1,15 +1,12 @@
 import {
   Args,
   Mutation,
-  Parent,
   Query,
-  ResolveField,
   Resolver,
 } from '@nestjs/graphql';
 import { UserModel } from '../models/user.model';
 import { Inject, UseGuards } from '@nestjs/common';
 import { UserService } from '../service/user.service';
-import { RobotModel as RobotsModel } from '../../robot/models/robot.model';
 import { RobotsService as RobotsService } from '../../robot/service/robots.service';
 import { GqlAuthGuard } from '../../../../core/modules/auth/guards/gql-auth.guard';
 import { GetUserArgs } from '../dto/args/get-user-args.dto';
@@ -23,7 +20,7 @@ export class UserResolver {
     private robotsService: RobotsService,
   ) {}
 
-  @UseGuards(GqlAuthGuard)
+  // @UseGuards(GqlAuthGuard)
   @Query((returns) => [UserModel])
   async customers(): Promise<UserModel[]> {
     return await this.customerService.findAll();

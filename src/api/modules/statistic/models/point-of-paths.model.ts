@@ -23,7 +23,7 @@ export class PointOfPathsModel {
   @Column({ name: 'session_id' })
   sessionId: number;
 
-  @ManyToOne((type) => SessionsModel, (session) => session.id, {
+  @ManyToOne(() => SessionsModel, (session) => session.id, {
     eager: true,
   })
   @JoinColumn({ name: 'session_id' })
