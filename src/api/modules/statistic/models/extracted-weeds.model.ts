@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { SessionsModel } from '../../sessions/models/sessions.model';
 import { WeedTypesModel } from './weed-types.model';
-import {PointOfPathsModel} from "../../map/models/point-of-paths.model";
+import { PointOfPathsModel } from '../../map/models/point-of-paths.model';
 
 @ObjectType()
 @Entity('Extracted_weeds')
@@ -18,17 +18,24 @@ export class ExtractedWeedsModel {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Field()
   @Column({ name: 'point_of_path_id' })
   pointPathId: number;
 
-  @Field(()=> PointOfPathsModel)
-  @ManyToOne(()=> PointOfPathsModel, (pointOfPaths)=> pointOfPaths.extractedWeed)
-  pointPath:PointOfPathsModel
+  @Field(() => PointOfPathsModel, { nullable: true })
+  @ManyToOne(
+    () => PointOfPathsModel,
+    (pointOfPaths) => pointOfPaths.extractedWeed,
+    { eager: true },
+  )
+  @JoinColumn({ name: 'point_of_path_id' })
+  pointPath: PointOfPathsModel;
 
   @Field()
   @Column({ name: 'session_id' })
   sessionId: number;
 
+  @Field(() => SessionsModel)
   @ManyToOne(() => SessionsModel, (session) => session.id, { eager: true })
   @JoinColumn({ name: 'session_id' })
   session: SessionsModel;

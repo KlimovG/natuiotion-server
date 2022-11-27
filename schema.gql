@@ -39,10 +39,26 @@ type WeedTypesModel {
   label: String!
 }
 
+type GpsPointModel {
+  id: Float!
+  quality: Float!
+  latitude: Float!
+  longitude: Float!
+}
+
+type PointOfPathsModel {
+  id: Float!
+  pointNumber: Float!
+  gpsPoint: GpsPointModel!
+  extractedWeed: [ExtractedWeedsModel!]!
+}
+
 type ExtractedWeedsModel {
   id: Float!
-  pointPath: Float!
+  pointPathId: Float!
+  pointPath: PointOfPathsModel
   sessionId: Float!
+  session: SessionsModel!
   weedType: WeedTypesModel!
 }
 
@@ -81,6 +97,20 @@ type StatisticDto {
   chart: ChartDataDto
 }
 
+type FieldModel {
+  id: Float!
+  label: String!
+  corners: [FieldCornerModel!]!
+}
+
+type FieldCornerModel {
+  id: Float!
+  field: FieldModel!
+  fieldId: Float!
+  gpsPointId: Float!
+  gpsPoint: GpsPointModel!
+}
+
 type Query {
   customers: [UserModel!]!
   customer(id: Float!, name: String!, email: String!, phone: String!): UserDto!
@@ -89,6 +119,8 @@ type Query {
   getSessionsForRobot(serial: String!): [SessionsModel!]!
   getStatisticForSession(session: Float!): VescStatisticModel!
   getRobotStats(session: Float!): StatisticDto!
+  getField(id: Float!): FieldModel!
+  getExtractedPoints(sessionId: Float!): [ExtractedWeedsModel!]!
 }
 
 type Mutation {

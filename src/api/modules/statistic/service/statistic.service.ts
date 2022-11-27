@@ -25,12 +25,12 @@ export class StatisticService {
     private sessionsService: SessionsService,
   ) {}
 
-  getVescStatistic(id: number): Promise<VescStatisticModel> {
-    return this.vescRepo.findOne({ where: { sessionId: id } });
+  getVescStatistic(sessionId: number): Promise<VescStatisticModel> {
+    return this.vescRepo.findOne({ where: { sessionId } });
   }
 
-  getExtractedWeeds(id: number): Promise<ExtractedWeedsModel[]> {
-    return this.extractedWeedsRepo.find({ where: { sessionId: id } });
+  getExtractedWeeds(sessionId: number): Promise<ExtractedWeedsModel[]> {
+    return this.extractedWeedsRepo.find({ where: { sessionId } });
   }
 
   async getRobotStatisticForSession(id: number): Promise<StatisticDto> {

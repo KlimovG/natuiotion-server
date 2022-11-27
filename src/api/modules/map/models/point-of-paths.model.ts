@@ -3,12 +3,14 @@ import {
   Column,
   Entity,
   JoinColumn,
-  ManyToOne, OneToMany, OneToOne,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { SessionsModel } from '../../sessions/models/sessions.model';
-import {GpsPointModel} from "./gps-point.model";
-import {ExtractedWeedsModel} from "../../statistic/models/extracted-weeds.model";
+import { GpsPointModel } from './gps-point.model';
+import { ExtractedWeedsModel } from '../../statistic/models/extracted-weeds.model';
 
 @ObjectType()
 @Entity('Points_of_paths')
@@ -21,7 +23,6 @@ export class PointOfPathsModel {
   @Column({ name: 'point_number' })
   pointNumber: number;
 
-  @Field()
   @Column({ name: 'session_id' })
   sessionId: number;
 
@@ -34,13 +35,12 @@ export class PointOfPathsModel {
   @Column({ name: 'gps_point_id' })
   gpsPointId: number;
 
-  @Field(()=> GpsPointModel)
-  @OneToOne(()=> GpsPointModel, (gps)=> gps.id)
+  @Field(() => GpsPointModel)
+  @OneToOne(() => GpsPointModel, (gps) => gps.id, { eager: true })
   @JoinColumn({ name: 'gps_point_id' })
   gpsPoint: GpsPointModel;
 
-  @Field(()=> [ExtractedWeedsModel])
-  @OneToMany(()=> ExtractedWeedsModel, (weed)=> weed.pointPath)
-  extractedWeed: ExtractedWeedsModel[]
-
+  @Field(() => [ExtractedWeedsModel])
+  @OneToMany(() => ExtractedWeedsModel, (weed) => weed.pointPath)
+  extractedWeed: ExtractedWeedsModel[];
 }
