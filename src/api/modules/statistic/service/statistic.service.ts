@@ -4,11 +4,9 @@ import { ExtractedWeedsModel } from '../models/extracted-weeds.model';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SessionsService } from '../../sessions/service/sessions.service';
-import { Temporal } from '@js-temporal/polyfill';
 import * as luxon from 'luxon';
-import { PointOfPathsModel } from '../models/point-of-paths.model';
+import { PointOfPathsModel } from '../../map/models/point-of-paths.model';
 import { WeedTypesModel } from '../models/weed-types.model';
-import { uniq, uniqBy } from 'lodash';
 import { ChartDataDto } from '../dto/chart-data.dto';
 import { StatisticDto } from '../dto/statistic.dto';
 

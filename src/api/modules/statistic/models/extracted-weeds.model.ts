@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { SessionsModel } from '../../sessions/models/sessions.model';
 import { WeedTypesModel } from './weed-types.model';
+import {PointOfPathsModel} from "../../map/models/point-of-paths.model";
 
 @ObjectType()
 @Entity('Extracted_weeds')
@@ -17,9 +18,12 @@ export class ExtractedWeedsModel {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Field()
   @Column({ name: 'point_of_path_id' })
-  pointPath: number;
+  pointPathId: number;
+
+  @Field(()=> PointOfPathsModel)
+  @ManyToOne(()=> PointOfPathsModel, (pointOfPaths)=> pointOfPaths.extractedWeed)
+  pointPath:PointOfPathsModel
 
   @Field()
   @Column({ name: 'session_id' })
@@ -29,8 +33,8 @@ export class ExtractedWeedsModel {
   @JoinColumn({ name: 'session_id' })
   session: SessionsModel;
 
-  @Field((type) => WeedTypesModel)
-  @OneToOne((type) => WeedTypesModel, (weed) => weed.id, { eager: true })
+  @Field(() => WeedTypesModel)
+  @OneToOne(() => WeedTypesModel, (weed) => weed.id, { eager: true })
   @JoinColumn({ name: 'weed_type_id' })
   weedType: WeedTypesModel;
 }

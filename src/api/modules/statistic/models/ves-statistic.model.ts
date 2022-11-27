@@ -16,14 +16,14 @@ export class VescStatisticModel {
   id: number;
 
   @Field()
-  @Column({ name: 'sessions_id' })
+  @Column({ name: 'session_id' })
   sessionId: number;
 
   @Field(() => SessionsModel)
   @OneToOne(() => SessionsModel, (session) => session.statistic, {
     eager: true,
   })
-  @JoinColumn({ name: 'sessions_id' })
+  @JoinColumn({ name: 'session_id' })
   session: SessionsModel;
 
   @Field()

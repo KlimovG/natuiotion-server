@@ -6,8 +6,7 @@ import { VescStatisticModel } from './models/ves-statistic.model';
 import { WeedTypesModel } from './models/weed-types.model';
 import { ExtractedWeedsModel } from './models/extracted-weeds.model';
 import { SessionsModule } from '../sessions/sessions.module';
-import { SessionsService } from '../sessions/service/sessions.service';
-import { PointOfPathsModel } from './models/point-of-paths.model';
+import { PointOfPathsModel } from '../map/models/point-of-paths.model';
 
 @Module({
   imports: [

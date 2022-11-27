@@ -3,10 +3,12 @@ import {
   Column,
   Entity,
   JoinColumn,
-  ManyToOne,
+  ManyToOne, OneToMany, OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { SessionsModel } from '../../sessions/models/sessions.model';
+import {GpsPointModel} from "./gps-point.model";
+import {ExtractedWeedsModel} from "../../statistic/models/extracted-weeds.model";
 
 @ObjectType()
 @Entity('Points_of_paths')
@@ -29,7 +31,16 @@ export class PointOfPathsModel {
   @JoinColumn({ name: 'session_id' })
   session: SessionsModel;
 
-  @Field()
   @Column({ name: 'gps_point_id' })
   gpsPointId: number;
+
+  @Field(()=> GpsPointModel)
+  @OneToOne(()=> GpsPointModel, (gps)=> gps.id)
+  @JoinColumn({ name: 'gps_point_id' })
+  gpsPoint: GpsPointModel;
+
+  @Field(()=> [ExtractedWeedsModel])
+  @OneToMany(()=> ExtractedWeedsModel, (weed)=> weed.pointPath)
+  extractedWeed: ExtractedWeedsModel[]
+
 }

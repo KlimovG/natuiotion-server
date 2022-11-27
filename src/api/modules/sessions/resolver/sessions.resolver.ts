@@ -14,12 +14,13 @@ export class SessionsResolver {
     @Inject(StatisticService)
     private serviceStatistic: StatisticService,
   ) {}
-  @Query((returns) => [SessionsModel])
+
+  @Query(() => [SessionsModel])
   async getAllSessions(): Promise<SessionsModel[]> {
     return await this.service.findAll();
   }
 
-  @Query((returns) => [SessionsModel])
+  @Query(() => [SessionsModel])
   async getSessionsForRobot(
     @Args('serial') serial: string,
   ): Promise<SessionsModel[]> {
