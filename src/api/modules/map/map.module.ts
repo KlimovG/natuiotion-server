@@ -7,10 +7,12 @@ import { MapService } from './service/map.service';
 import { MapResolver } from './resolver/map.resolver';
 import { GpsPointModel } from './models/gps-point.model';
 import { StatisticModule } from '../statistic/statistic.module';
+import { SessionsModule } from '../sessions/sessions.module';
 
 @Module({
   imports: [
     forwardRef(() => StatisticModule),
+    forwardRef(() => SessionsModule),
     TypeOrmModule.forFeature([
       PointOfPathsModel,
       FieldCornerModel,

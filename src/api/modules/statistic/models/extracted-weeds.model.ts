@@ -44,6 +44,10 @@ export class ExtractedWeedsModel {
   @OneToOne(() => WeedTypesModel, (weed) => weed.id, { eager: true })
   @JoinColumn({ name: 'weed_type_id' })
   weedType: WeedTypesModel;
+
+  @Field()
+  @Column({ name: 'number' })
+  number: number;
 }
 
 export enum WeedTypes {

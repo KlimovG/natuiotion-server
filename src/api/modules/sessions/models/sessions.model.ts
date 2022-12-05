@@ -8,10 +8,10 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Field, ObjectType } from '@nestjs/graphql';
-import { RobotNumberModel } from '../../robot/models/robot-number.model';
 import { VescStatisticModel } from '../../statistic/models/ves-statistic.model';
 import { ExtractedWeedsModel } from '../../statistic/models/extracted-weeds.model';
 import { RobotModel } from '../../robot/models/robot.model';
+import { FieldModel } from '../../map/models/field.model';
 
 @ObjectType()
 @Entity('Sessions')
@@ -39,15 +39,26 @@ export class SessionsModel {
   @JoinColumn({ name: 'robot_serial_number' })
   robotSerialNumber: RobotModel;
 
+  @Field()
+  @Column({ name: 'robot_serial_number' })
+  robotNumber: string;
+
   @Field(() => [ExtractedWeedsModel], { nullable: true })
   @OneToMany(() => ExtractedWeedsModel, (extracted) => extracted.session)
   extractedWeeds: ExtractedWeedsModel[];
 
-  @Field()
+  @Field(() => FieldModel)
+  @OneToOne(() => FieldModel, (vesc) => vesc.id, { eager: true })
+  @JoinColumn({ name: 'field_id' })
+  fieldName: FieldModel;
+
   @Column({ name: 'field_id' })
   fieldId: number;
 
   @Field(() => VescStatisticModel, { nullable: true })
-  @OneToOne(() => VescStatisticModel, (vesc) => vesc.session)
+  @OneToOne(() => VescStatisticModel, (vesc) => vesc.sessionModel)
   statistic: VescStatisticModel;
+
+  @Field({ nullable: true })
+  extracted?: number;
 }

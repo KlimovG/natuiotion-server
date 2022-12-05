@@ -1,5 +1,4 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { DurationType } from '../../../../utils/date-types';
 import { ChartDataDto } from './chart-data.dto';
 
 @ObjectType()
@@ -8,7 +7,7 @@ export class StatisticDto {
   voltage?: number;
 
   @Field()
-  duration?: DurationType;
+  duration?: string;
 
   @Field()
   totalNumber: number;

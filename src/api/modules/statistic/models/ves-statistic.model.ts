@@ -15,16 +15,16 @@ export class VescStatisticModel {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Field()
-  @Column({ name: 'session_id' })
-  sessionId: number;
-
   @Field(() => SessionsModel)
   @OneToOne(() => SessionsModel, (session) => session.statistic, {
     eager: true,
   })
   @JoinColumn({ name: 'session_id' })
-  session: SessionsModel;
+  sessionModel: SessionsModel;
+
+  @Field()
+  @Column({ name: 'session_id' })
+  sessionId: number;
 
   @Field()
   @Column({ type: 'decimal', precision: 2 })

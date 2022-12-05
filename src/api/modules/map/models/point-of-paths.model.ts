@@ -40,7 +40,7 @@ export class PointOfPathsModel {
   @JoinColumn({ name: 'gps_point_id' })
   gpsPoint: GpsPointModel;
 
-  @Field(() => [ExtractedWeedsModel])
+  @Field(() => [ExtractedWeedsModel], { nullable: true })
   @OneToMany(() => ExtractedWeedsModel, (weed) => weed.pointPath)
   extractedWeed: ExtractedWeedsModel[];
 }

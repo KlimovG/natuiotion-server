@@ -24,7 +24,20 @@ export class SessionsResolver {
   async getSessionsForRobot(
     @Args('serial') serial: string,
   ): Promise<SessionsModel[]> {
-    return await this.service.findAllByName(serial);
+    const sessions = await this.service.findAllByName(serial);
+    return sessions.map((session) => {
+      if (session?.extractedWeeds && session?.extractedWeeds?.length) {
+        const extracted = session.extractedWeeds.reduce(
+          (acc, value) => acc + value.number,
+          0,
+        );
+        return {
+          ...session,
+          extracted,
+        };
+      }
+      return session;
+    });
   }
 
   @ResolveField(() => VescStatisticModel)

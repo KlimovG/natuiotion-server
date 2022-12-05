@@ -16,8 +16,16 @@ export class SessionsService implements BaseService<SessionsModel> {
   }
 
   findAllByName(robotSerialNumber: string): Promise<SessionsModel[]> {
-    return this.sessionRepo.findBy({
-      robotSerialNumber: { serial: robotSerialNumber },
+    return this.sessionRepo.find({
+      where: {
+        robotNumber: robotSerialNumber,
+      },
+      relations: {
+        extractedWeeds: true,
+      },
+      order: {
+        startTime: 'DESC',
+      },
     });
   }
 

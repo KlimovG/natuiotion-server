@@ -4,6 +4,7 @@ import { MapService } from '../service/map.service';
 import { FieldModel } from '../models/field.model';
 import { FieldCornerModel } from '../models/fields-corners.model';
 import { ExtractedWeedsModel } from '../../statistic/models/extracted-weeds.model';
+import { PointOfPathsModel } from '../models/point-of-paths.model';
 
 @Resolver(FieldModel)
 export class MapResolver {
@@ -22,11 +23,13 @@ export class MapResolver {
     return await this.service.getExtractedPoints(sessionId);
   }
 
-  // @Query()
-  // async getPath(sessionId: number) {}
+  @Query(() => [PointOfPathsModel])
+  getPath(@Args('sessionId') sessionId: number) {
+    return this.service.getPath(sessionId);
+  }
 
   @ResolveField(() => [FieldCornerModel])
-  async corners(@Parent() field: FieldModel): Promise<FieldCornerModel[]> {
+  corners(@Parent() field: FieldModel): Promise<FieldCornerModel[]> {
     return this.service.getCorners(field.id);
   }
 }

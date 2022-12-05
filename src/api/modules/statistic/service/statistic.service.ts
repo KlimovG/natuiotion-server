@@ -36,19 +36,18 @@ export class StatisticService {
   async getRobotStatisticForSession(id: number): Promise<StatisticDto> {
     const { startTime: start, endTime: end } =
       await this.sessionsService.findOne(id);
-    const { voltage } = await this.getVescStatistic(id);
+    const statistic = await this.getVescStatistic(id);
     const startTime = luxon.DateTime.fromJSDate(start);
     const endTime = luxon.DateTime.fromJSDate(end);
-    const duration = endTime.diff(startTime, ['hours', 'minutes']).toObject();
-
+    const duration = endTime
+      .diff(startTime, ['hours', 'minutes'])
+      .toFormat('hh:mm');
     const extractedWeeds = await this.getExtractedWeeds(id);
     const chart = this.convertChartData(extractedWeeds);
-
-    console.log(chart);
     const totalNumber = extractedWeeds.length;
 
     return {
-      voltage,
+      voltage: statistic?.voltage ? statistic.voltage : null,
       duration,
       totalNumber,
       chart,
