@@ -28,19 +28,44 @@ export class MapService {
     return await this.fieldRepo.findOneBy({ id: fieldId });
   }
 
-  async getPath(sessionId: number) {
+  async getPath(sessionId: number): Promise<[number, number][]> {
     this.logger.log(`Getting path for session ID:${sessionId}`);
-    return this.pointsRepo.findBy({ sessionId });
+    const path = await this.pointsRepo.findBy({ sessionId });
+    if (path?.length) {
+      return path.map((value) => [
+        Number(value.gpsPoint.longitude),
+        Number(value.gpsPoint.latitude),
+      ]);
+    }
+    return null;
   }
 
   async getExtractedPoints(sessionId: number) {
     this.logger.log(
       `Getting extracted gps points for session with ID:${sessionId}`,
     );
-    return await this.statisticService.getExtractedWeeds(sessionId);
+    const extracted = await this.statisticService.getExtractedWeeds(sessionId);
+    if (extracted) {
+      const mappedPoints = extracted.map((value) => ({
+        ...value,
+        weedType: value.weedType.label.replace(/[^a-zA-Z0-9 ]/g, ' ').trim(),
+        pointPath: [
+          Number(value.pointPath.gpsPoint.longitude),
+          Number(value.pointPath.gpsPoint.latitude),
+        ],
+      }));
+      return mappedPoints;
+    }
+    return extracted;
   }
 
-  getCorners(fieldId: number) {
-    return this.cornerRepo.findBy({ fieldId });
+  async getCorners(fieldId: number): Promise<number[][]> {
+    const corners = await this.cornerRepo.findBy({ fieldId });
+    const formatted = corners.map((value) => [
+      value.gpsPoint.longitude,
+      value.gpsPoint.latitude,
+    ]);
+    formatted.push(formatted.at(0));
+    return formatted;
   }
 }

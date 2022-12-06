@@ -23,8 +23,8 @@ type RobotModel {
 
 type VescStatisticModel {
   id: Float!
+  sessionModel: SessionsModel!
   sessionId: Float!
-  session: SessionsModel!
   voltage: Float!
   timestamp: DateTime!
 }
@@ -50,7 +50,7 @@ type PointOfPathsModel {
   id: Float!
   pointNumber: Float!
   gpsPoint: GpsPointModel!
-  extractedWeed: [ExtractedWeedsModel!]!
+  extractedWeed: [ExtractedWeedsModel!]
 }
 
 type ExtractedWeedsModel {
@@ -60,6 +60,13 @@ type ExtractedWeedsModel {
   sessionId: Float!
   session: SessionsModel!
   weedType: WeedTypesModel!
+  number: Float!
+}
+
+type FieldModel {
+  id: Float!
+  label: String!
+  corners: [[Float!]!]!
 }
 
 type SessionsModel {
@@ -68,21 +75,11 @@ type SessionsModel {
   endTime: DateTime!
   prevSessionId: Float
   robotSerialNumber: RobotModel!
+  robotNumber: String!
   extractedWeeds: [ExtractedWeedsModel!]
-  fieldId: Float!
+  fieldName: FieldModel!
   statistic: VescStatisticModel
-}
-
-type DurationType {
-  years: Float!
-  quarters: Float!
-  months: Float!
-  weeks: Float!
-  days: Float!
-  hours: Float!
-  minutes: Float!
-  seconds: Float!
-  milliseconds: Float!
+  extracted: Float
 }
 
 type ChartDataDto {
@@ -92,23 +89,16 @@ type ChartDataDto {
 
 type StatisticDto {
   voltage: Float!
-  duration: DurationType!
+  duration: String!
   totalNumber: Float!
   chart: ChartDataDto
 }
 
-type FieldModel {
+type ExtractedDto {
   id: Float!
-  label: String!
-  corners: [FieldCornerModel!]!
-}
-
-type FieldCornerModel {
-  id: Float!
-  field: FieldModel!
-  fieldId: Float!
-  gpsPointId: Float!
-  gpsPoint: GpsPointModel!
+  pointPath: [Float!]
+  weedType: String!
+  number: Float!
 }
 
 type Query {
@@ -120,7 +110,8 @@ type Query {
   getStatisticForSession(session: Float!): VescStatisticModel!
   getRobotStats(session: Float!): StatisticDto!
   getField(id: Float!): FieldModel!
-  getExtractedPoints(sessionId: Float!): [ExtractedWeedsModel!]!
+  getExtractedPoints(sessionId: Float!): [ExtractedDto!]
+  getPath(sessionId: Float!): [[Float!]!]
 }
 
 type Mutation {
