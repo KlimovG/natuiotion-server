@@ -44,7 +44,10 @@ export class StatisticService {
       .toFormat('hh:mm');
     const extractedWeeds = await this.getExtractedWeeds(id);
     const chart = this.convertChartData(extractedWeeds);
-    const totalNumber = extractedWeeds.length;
+    const totalNumber = extractedWeeds.reduce(
+      (total, extracted) => total + extracted.number,
+      0,
+    );
 
     return {
       voltage: statistic?.voltage ? statistic.voltage : null,
