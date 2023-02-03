@@ -1,9 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { UserService } from '../../../../api/modules/user/service/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 import { UserDto } from '../../../../api/modules/user/dto/user.dto';
+import { createCipheriv, randomBytes, scrypt as _scrypt } from 'crypto';
+import { promisify } from 'util';
+
+const scrypt = promisify(_scrypt);
 
 export interface TokenPayload {
   username: string;
@@ -27,12 +31,24 @@ export class AuthService {
       expires.getSeconds() + this.configService.get('JWT_EXPIRATION'),
     );
 
-    const token = this.jwtService.signAsync(tokenPayload);
+    const token = await this.jwtService.signAsync(tokenPayload);
 
     response.cookie('Authentication', token, {
       httpOnly: true,
       expires,
     });
+  }
+
+  async registration(login: string, password: string) {
+    //See if user already in use
+    const user = await this.usersService.getUser(login);
+    if (!user?.email) {
+      throw new BadRequestException('User exist');
+    }
+
+    // Hash the users password
+    // Generate a salt
+    // const salt =
   }
 
   async getTokens(user: UserDto) {
