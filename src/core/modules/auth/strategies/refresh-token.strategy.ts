@@ -14,13 +14,12 @@ export class RefreshTokenStrategy extends PassportStrategy(
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: Request) => request?.cookies?.Authentication,
       ]),
-      secretOrKey: configService.get<string>('JWT_SECRET'),
+      secretOrKey: configService.get<string>('JWT_ACCESS'),
       passReqToCallback: true,
     });
   }
   validate(req: Request, payload: any) {
     const refreshToken = req.get('Authentication');
-    console.log(refreshToken);
 
     return { ...payload, refreshToken };
   }

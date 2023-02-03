@@ -16,11 +16,11 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: Request) => request?.cookies?.Authentication,
       ]),
-      secretOrKey: configService.get<string>('JWT_SECRET'),
+      secretOrKey: configService.get<string>('JWT_ACCESS'),
     });
   }
 
-  async validate({ email }: TokenPayload) {
-    return this.userService.getUser(email);
+  async validate({ id }: TokenPayload) {
+    return this.userService.findById(id);
   }
 }

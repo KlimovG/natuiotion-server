@@ -12,10 +12,10 @@ import * as Joi from 'joi';
       isGlobal: true,
       validationSchema: Joi.object({
         PORT: Joi.number().required(),
-        JWT_SECRET: Joi.string().required(),
-        JWT_SECRET_EXPIRATION: Joi.number().required(),
+        JWT_ACCESS: Joi.string().required(),
+        JWT_ACCESS_EXPIRATION: Joi.string().required(),
         JWT_REFRESH: Joi.string().required(),
-        JWT_REFRESH_EXPIRATION: Joi.number().required(),
+        JWT_REFRESH_EXPIRATION: Joi.string().required(),
       }),
     }),
   ],

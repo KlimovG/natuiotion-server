@@ -1,4 +1,10 @@
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserModel } from '../models/user.model';
 import { Repository } from 'typeorm';
@@ -17,7 +23,9 @@ export class UserService {
   ) {}
 
   async create(input: UserRegistrationInput): Promise<UserModel> {
-    return await this.repository.save(input);
+    const user = this.repository.create(input);
+
+    return await this.repository.save(user);
   }
 
   findAll(): Promise<UserModel[]> {
@@ -34,13 +42,14 @@ export class UserService {
     return await this.repository.findOneBy({ email });
   }
 
-  async validateUser(email: string, password: string): Promise<UserDto> {
-    const user = await this.findByLogin(email);
-    const isPasswordValid = Md5.hashStr(password) === user.password;
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Credentials are not valid');
+  async findById(id: number): Promise<UserDto> {
+    const user = await this.repository.findOneBy({ id });
+    if (user) {
+      return this.mapper.toUserDto(user);
     }
-
-    return this.mapper.toUserDto(user);
+    throw new HttpException(
+      'User with this id does not exist',
+      HttpStatus.NOT_FOUND,
+    );
   }
 }

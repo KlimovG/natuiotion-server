@@ -10,13 +10,4 @@ export class UserDto {
   @Field()
   @IsNotEmpty()
   name: string;
-
-  @Field()
-  @IsNotEmpty()
-  @IsEmail()
-  email: string;
-
-  @Field()
-  @IsNotEmpty()
-  phone: string;
 }

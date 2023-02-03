@@ -13,8 +13,6 @@ type UserModel {
 type UserDto {
   id: Float!
   name: String!
-  email: String!
-  phone: String!
 }
 
 type RobotModel {

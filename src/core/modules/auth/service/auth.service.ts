@@ -1,4 +1,12 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { UserService } from '../../../../api/modules/user/service/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -8,13 +16,14 @@ import { createCipheriv, randomBytes, scrypt as _scrypt } from 'crypto';
 import { promisify } from 'util';
 import * as bcrypt from 'bcrypt';
 import { UserRegistrationInput } from '../../../../api/modules/user/dto/input/user-reg-input.dto';
+import { UserLoginInput } from '../../../../api/modules/user/dto/input/user-login-input.dto';
+import * as luxon from 'luxon';
 
 const scrypt = promisify(_scrypt);
 
 export interface TokenPayload {
-  username: string;
-  email: string;
   id: number;
+  createdAt: string;
 }
 
 @Injectable()
@@ -26,24 +35,6 @@ export class AuthService {
     private jwtService: JwtService,
     private configService: ConfigService,
   ) {}
-
-  async login(user: UserDto, response: Response) {
-    const tokenPayload = this.generateTokenPayload(user);
-
-    const expires = new Date();
-    expires.setSeconds(
-      expires.getSeconds() + this.configService.get('JWT_EXPIRATION'),
-    );
-    // Hash the users password
-    // Generate a salt
-    const salt = await bcrypt.genSalt();
-    const token = await this.jwtService.signAsync(tokenPayload);
-
-    response.cookie('Authentication', token, {
-      httpOnly: true,
-      expires,
-    });
-  }
 
   async registration({
     email: login,
@@ -76,10 +67,57 @@ export class AuthService {
       password: resultPassword,
       phone,
     };
+    try {
+      const user = await this.usersService.create(userData);
+      return `User with id ${user.id} was created`;
+    } catch (error) {
+      if (error.message.includes('User already exists')) {
+        throw new ConflictException('User already exists');
+      } else if (error.message.includes('Validation error')) {
+        throw new BadRequestException(error.message);
+      } else {
+        throw new InternalServerErrorException();
+      }
+    }
+  }
 
-    const user = await this.usersService.create(userData);
+  async login({ email: login, password }: UserLoginInput) {
+    try {
+      this.logger.log('Find user with login');
+      //See if user not exist
+      const user = await this.usersService.findByLogin(login);
+      if (!user?.email) {
+        throw new BadRequestException('User not exist');
+      }
 
-    return !!user?.email ? 'User created' : 'USer creation was failed';
+      // Hash the salt and the password
+      const [_, salt] = user.password.split('.');
+      const hash = await bcrypt.hash(password, salt);
+
+      // Check if password are equal
+      // const isPasswordsEqual = storedPassword === resultPassword;
+      // const isPasswordsEqual = await bcrypt.compare(password, hash);
+      await this.verifyPassword(password, hash);
+
+      return await this.usersService.getUser(login);
+    } catch (e) {
+      throw new HttpException(
+        'Wrong credentials provided',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    // const tokenPayload = this.generateTokenPayload(user);
+    //
+    // const expires = new Date();
+    // expires.setSeconds(
+    //   expires.getSeconds() + this.configService.get('JWT_EXPIRATION'),
+    // );
+    // const token = await this.jwtService.signAsync(tokenPayload);
+
+    // response.cookie('Authentication', token, {
+    //   httpOnly: true,
+    //   expires,
+    // });
   }
 
   async getTokens(user: UserDto) {
@@ -87,22 +125,32 @@ export class AuthService {
 
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {
-        secret: this.configService.get<string>('JWT_SECRET'),
-        expiresIn: this.configService.get<string>('JWT_SECRET_EXPIRATION'),
+        secret: this.configService.get<string>('JWT_ACCESS'),
+        expiresIn: this.configService.get<number>('JWT_ACCESS_EXPIRATION'),
       }),
       this.jwtService.signAsync(payload, {
         secret: this.configService.get<string>('JWT_REFRESH'),
-        expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRATION'),
+        expiresIn: this.configService.get<number>('JWT_REFRESH_EXPIRATION'),
       }),
     ]);
 
-    return {
-      accessToken,
-      refreshToken,
-    };
+    return [accessToken, refreshToken];
+  }
+
+  private async verifyPassword(password: string, hashedPassword: string) {
+    const isPasswordsEqual = await bcrypt.compare(password, hashedPassword);
+
+    if (!isPasswordsEqual) {
+      throw new HttpException(
+        'Wrong credentials provided',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
   private generateTokenPayload(user: UserDto): TokenPayload {
-    return { username: user.name, email: user.email, id: user.id };
+    const createdAt = luxon.DateTime.now().toString();
+
+    return { id: user.id, createdAt };
   }
 }
