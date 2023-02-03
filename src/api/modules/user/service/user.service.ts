@@ -1,4 +1,4 @@
-import {Injectable, Logger, UnauthorizedException} from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserModel } from '../models/user.model';
 import { Repository } from 'typeorm';
@@ -17,12 +17,11 @@ export class UserService {
   ) {}
 
   async create(input: UserRegistrationInput): Promise<UserModel> {
-    const hashPwd = Md5.hashStr(input.password);
-    return await this.repository.save({ ...input, password: hashPwd });
+    return await this.repository.save(input);
   }
 
   findAll(): Promise<UserModel[]> {
-    this.logger.log('Getting all users')
+    this.logger.log('Getting all users');
     return this.repository.find();
   }
 
@@ -31,7 +30,7 @@ export class UserService {
     return this.mapper.toUserDto(user);
   }
 
-  private async findByLogin(email: string): Promise<UserModel> {
+  async findByLogin(email: string): Promise<UserModel> {
     return await this.repository.findOneBy({ email });
   }
 
