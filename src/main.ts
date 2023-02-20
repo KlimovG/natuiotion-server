@@ -5,15 +5,16 @@ import cookieParser from 'cookie-parser';
 import { Logger, ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    cors: true,
+  });
   const configService = app.get(ConfigService);
   const port = configService.get<string>('PORT');
   const logger = new Logger('Bootstrap');
+
   app.use(cookieParser());
-  app.enableCors({
-    credentials: true,
-  });
   app.useGlobalPipes(new ValidationPipe());
+
   await app
     .setGlobalPrefix('api')
     .listen(Number(port))

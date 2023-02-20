@@ -3,15 +3,11 @@ import {
   AfterInsert,
   AfterRemove,
   AfterUpdate,
-  BeforeInsert,
   Column,
   Entity,
-  OneToMany,
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
-// import { RobotModel as Robots } from '../../robot/models/robot.model';
-import { Md5 } from 'ts-md5';
 import { Logger } from '@nestjs/common';
 
 @ObjectType()
@@ -40,19 +36,19 @@ export class UserModel {
   @Column({ name: 'hash_pwd', length: 20, nullable: false })
   password: string;
 
-  // @Field((type) => [Robots], { nullable: true })
-  // @OneToMany((type) => Robots, (robot) => robot.user)
-  // robots: Robots[];
+  @Column({ name: 'hash_rt', length: 20, nullable: true })
+  refreshToken: string;
+
   @AfterInsert()
   logInsert() {
-    this.logger.log('Inserted User with id: ', this.id);
+    this.logger.log(`Inserted User with id: ${this.id}`);
   }
   @AfterUpdate()
   logUpdate() {
-    this.logger.log('Updated User with id: ', this.id);
+    this.logger.log(`Updated User with id: ${this.id}`);
   }
   @AfterRemove()
   logRemove() {
-    this.logger.log('Removed User with id: ', this.id);
+    this.logger.log(`Removed User with id: ${this.id}`);
   }
 }

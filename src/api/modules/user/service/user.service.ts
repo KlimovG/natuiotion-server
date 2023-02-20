@@ -1,14 +1,7 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  Logger,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserModel } from '../models/user.model';
 import { Repository } from 'typeorm';
-import { Md5 } from 'ts-md5';
 import { UserMapper } from './user.mapper';
 import { UserDto } from '../dto/user.dto';
 import { UserRegistrationInput } from '../dto/input/user-reg-input.dto';
@@ -16,6 +9,7 @@ import { UserRegistrationInput } from '../dto/input/user-reg-input.dto';
 @Injectable()
 export class UserService {
   private readonly logger = new Logger('User');
+
   constructor(
     @InjectRepository(UserModel)
     private repository: Repository<UserModel>,
@@ -42,10 +36,14 @@ export class UserService {
     return await this.repository.findOneBy({ email });
   }
 
-  async findById(id: number): Promise<UserDto> {
+  async update(userId: number, data: any): Promise<any> {
+    return await this.repository.update(userId, data);
+  }
+
+  async findById(id: number): Promise<UserModel> {
     const user = await this.repository.findOneBy({ id });
     if (user) {
-      return this.mapper.toUserDto(user);
+      return user;
     }
     throw new HttpException(
       'User with this id does not exist',

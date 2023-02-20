@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   HttpException,
   HttpStatus,
   Injectable,
@@ -8,40 +9,34 @@ import {
   Logger,
 } from '@nestjs/common';
 import { UserService } from '../../../../api/modules/user/service/user.service';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
-import { Response } from 'express';
-import { UserDto } from '../../../../api/modules/user/dto/user.dto';
-import { createCipheriv, randomBytes, scrypt as _scrypt } from 'crypto';
-import { promisify } from 'util';
 import * as bcrypt from 'bcrypt';
 import { UserRegistrationInput } from '../../../../api/modules/user/dto/input/user-reg-input.dto';
 import { UserLoginInput } from '../../../../api/modules/user/dto/input/user-login-input.dto';
-import * as luxon from 'luxon';
-
-const scrypt = promisify(_scrypt);
-
-export interface TokenPayload {
-  id: number;
-  createdAt: string;
-}
+import { JwtService } from './jwt.service';
 
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger('AuthService');
-
   constructor(
     private usersService: UserService,
     private jwtService: JwtService,
-    private configService: ConfigService,
   ) {}
+
+  private async hashData(data: string): Promise<string> {
+    const salt = await bcrypt.genSalt();
+    const hashedData = await bcrypt.hash(data, salt);
+    return hashedData.toString();
+  }
 
   async registration({
     email: login,
     password,
     phone,
     name,
-  }: UserRegistrationInput): Promise<string> {
+  }: UserRegistrationInput): Promise<{
+    accessToken: string;
+    refreshToken: string;
+  }> {
     this.logger.log('Check if the user with this login already exist');
     //See if user already in use
     const isUser = await this.usersService.findByLogin(login);
@@ -57,19 +52,26 @@ export class AuthService {
     const hash = await bcrypt.hash(password, salt);
 
     // Join the hashed password with the salt
-    const resultPassword = hash.toString() + '.' + salt;
 
     this.logger.log('Generate new user data with hashed password');
 
     const userData: UserRegistrationInput = {
       email: login,
       name,
-      password: resultPassword,
+      password: hash,
       phone,
     };
+
     try {
       const user = await this.usersService.create(userData);
-      return `User with id ${user.id} was created`;
+
+      const { accessToken, refreshToken } = await this.jwtService.getTokens(
+        user.id,
+      );
+
+      this.logger.log(`User with id ${user.id} was created`);
+
+      return { accessToken, refreshToken };
     } catch (error) {
       if (error.message.includes('User already exists')) {
         throw new ConflictException('User already exists');
@@ -86,55 +88,58 @@ export class AuthService {
       this.logger.log('Find user with login');
       //See if user not exist
       const user = await this.usersService.findByLogin(login);
-      if (!user?.email) {
+
+      if (!user) {
         throw new BadRequestException('User not exist');
       }
 
-      // Hash the salt and the password
-      const [_, salt] = user.password.split('.');
-      const hash = await bcrypt.hash(password, salt);
-
       // Check if password are equal
-      // const isPasswordsEqual = storedPassword === resultPassword;
-      // const isPasswordsEqual = await bcrypt.compare(password, hash);
-      await this.verifyPassword(password, hash);
+      await this.verifyPassword(password, user.password);
 
-      return await this.usersService.getUser(login);
+      const { accessToken, refreshToken } = await this.jwtService.getTokens(
+        user.id,
+      );
+
+      await this.updateRefresh(user.id, refreshToken);
+
+      return {
+        accessToken,
+        refreshToken,
+      };
     } catch (e) {
       throw new HttpException(
         'Wrong credentials provided',
         HttpStatus.BAD_REQUEST,
       );
     }
-    // const tokenPayload = this.generateTokenPayload(user);
-    //
-    // const expires = new Date();
-    // expires.setSeconds(
-    //   expires.getSeconds() + this.configService.get('JWT_EXPIRATION'),
-    // );
-    // const token = await this.jwtService.signAsync(tokenPayload);
-
-    // response.cookie('Authentication', token, {
-    //   httpOnly: true,
-    //   expires,
-    // });
   }
 
-  async getTokens(user: UserDto) {
-    const payload = this.generateTokenPayload(user);
+  async logout(userId: number) {
+    await this.usersService.update(userId, {
+      refreshToken: null,
+    });
+  }
 
-    const [accessToken, refreshToken] = await Promise.all([
-      this.jwtService.signAsync(payload, {
-        secret: this.configService.get<string>('JWT_ACCESS'),
-        expiresIn: this.configService.get<number>('JWT_ACCESS_EXPIRATION'),
-      }),
-      this.jwtService.signAsync(payload, {
-        secret: this.configService.get<string>('JWT_REFRESH'),
-        expiresIn: this.configService.get<number>('JWT_REFRESH_EXPIRATION'),
-      }),
-    ]);
+  async verifyRefreshToken(userId: number, rt: string): Promise<boolean> {
+    const user = await this.usersService.findById(userId);
 
-    return [accessToken, refreshToken];
+    if (!user) throw new ForbiddenException('Access Denied');
+
+    const isRefreshTokenMatches = await bcrypt.compare(rt, user.refreshToken);
+
+    if (!isRefreshTokenMatches) throw new ForbiddenException('Access Denied');
+
+    return true;
+  }
+
+  async refreshToken(userId: number, rt: string) {
+    await this.verifyRefreshToken(userId, rt);
+
+    const tokens = await this.jwtService.getTokens(userId);
+
+    await this.updateRefresh(userId, tokens.refreshToken);
+
+    return tokens;
   }
 
   private async verifyPassword(password: string, hashedPassword: string) {
@@ -148,9 +153,15 @@ export class AuthService {
     }
   }
 
-  private generateTokenPayload(user: UserDto): TokenPayload {
-    const createdAt = luxon.DateTime.now().toString();
+  async updateRefresh(userId: number, rt: string) {
+    const hashedToken = await this.hashData(rt);
 
-    return { id: user.id, createdAt };
+    try {
+      await this.usersService.update(userId, {
+        refreshToken: hashedToken,
+      });
+    } finally {
+      this.logger.log('Refresh token was successfully updated');
+    }
   }
 }

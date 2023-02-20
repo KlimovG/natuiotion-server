@@ -1,9 +1,4 @@
-import {
-  Args,
-  Mutation,
-  Query,
-  Resolver,
-} from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UserModel } from '../models/user.model';
 import { Inject, UseGuards } from '@nestjs/common';
 import { UserService } from '../service/user.service';
@@ -20,7 +15,7 @@ export class UserResolver {
     private robotsService: RobotsService,
   ) {}
 
-  // @UseGuards(GqlAuthGuard)
+  @UseGuards(GqlAuthGuard)
   @Query((returns) => [UserModel])
   async customers(): Promise<UserModel[]> {
     return await this.customerService.findAll();

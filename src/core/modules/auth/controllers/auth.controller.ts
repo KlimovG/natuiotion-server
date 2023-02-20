@@ -3,72 +3,74 @@ import {
   Controller,
   Get,
   HttpCode,
+  HttpStatus,
   Post,
   Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { LocalAuthGuard } from '../guards/local-auth.guard';
-import { CurrentUser } from '../decorators/current-user.decorator';
 import { AuthService } from '../service/auth.service';
-import { Response } from 'express';
-import { UserDto } from '../../../../api/modules/user/dto/user.dto';
-import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+import { Response, Request } from 'express';
+import { AccessTokenGuard } from '../guards/access-token.guard';
 import { UserRegistrationInput } from '../../../../api/modules/user/dto/input/user-reg-input.dto';
 import { UserLoginInput } from '../../../../api/modules/user/dto/input/user-login-input.dto';
-import { ConfigService } from '@nestjs/config';
-import * as luxon from 'luxon';
-import { DateTime } from 'luxon';
-import { RequestWithUserInterface } from '../utils/request-with-user.interface';
+import { GetCurrentUser } from '../decorators/current-user.decorator';
+import { RefreshGuard } from '../guards/refresh-token-jwt.guard';
+import { TokenPayload } from '../service/jwt.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService,
-    private configService: ConfigService,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Post('registration')
+  @HttpCode(HttpStatus.CREATED)
   async createUser(
     @Body() user: UserRegistrationInput,
     @Res({ passthrough: true }) response: Response,
-  ): Promise<string> {
+  ): Promise<{
+    accessToken: string;
+    refreshToken: string;
+  }> {
     return await this.authService.registration(user);
   }
-
-  @HttpCode(200)
-  @UseGuards(LocalAuthGuard)
   @Post('login')
+  @HttpCode(HttpStatus.OK)
   async login(
-    @Body() login: UserLoginInput,
+    @Body() input: UserLoginInput,
     @Res({ passthrough: true }) response: Response,
-    @Req() request: RequestWithUserInterface,
+    @Req() request: Request,
   ) {
-    const tokenExpiration = (tokenName: string): Date => {
-      const nowInMillis = DateTime.local().toMillis();
-      const expiration = this.configService.get<string>(tokenName);
-      return DateTime.fromMillis(nowInMillis)
-        .toUTC()
-        .setZone('Europe/Paris')
-        .toJSDate();
-    };
-
-    const [accessToken, refreshToken] = await this.authService.getTokens(
-      request.user,
-    );
-    response.cookie('accessToken', accessToken, {
-      httpOnly: true,
-    });
-    response.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-    });
-
-    response.send(request.user);
+    const tokens = await this.authService.login(input);
+    response.send(tokens);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get()
-  isAuthenticated() {
-    return true;
+  @UseGuards(RefreshGuard)
+  @Get('authenticate')
+  async authenticate(@GetCurrentUser() user: TokenPayload): Promise<any> {
+    const tokens = await this.authService.refreshToken(
+      user.sub,
+      user.refreshToken,
+    );
+    return {
+      id: user.sub,
+      ...tokens,
+    };
+  }
+
+  @UseGuards(RefreshGuard)
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
+  async refreshToken(@Req() request: Request) {
+    return await this.authService.refreshToken(
+      request.user['sub'],
+      request.user['refreshToken'],
+    );
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Post('/logout')
+  @HttpCode(HttpStatus.OK)
+  async logout(@GetCurrentUser('sub') id: number) {
+    await this.authService.logout(id);
   }
 }
