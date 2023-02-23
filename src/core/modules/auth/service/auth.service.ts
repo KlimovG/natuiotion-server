@@ -128,7 +128,7 @@ export class AuthService {
   async verifyRefreshToken(userId: number, rt: string): Promise<boolean> {
     const user = await this.usersService.findById(userId);
 
-    if (!user) throw new ForbiddenException('Access Denied');
+    if (!user?.refreshToken) throw new ForbiddenException('Access Denied');
 
     const isRefreshTokenMatches = await bcrypt.compare(rt, user.refreshToken);
 
