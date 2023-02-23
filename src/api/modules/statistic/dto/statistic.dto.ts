@@ -3,13 +3,13 @@ import { ChartDataDto } from './chart-data.dto';
 
 @ObjectType()
 export class StatisticDto {
-  @Field()
+  @Field({ nullable: true })
   voltage?: number;
 
-  @Field()
+  @Field({ nullable: true })
   duration?: string;
 
-  @Field()
+  @Field({ nullable: true })
   totalNumber: number;
 
   @Field({ nullable: true })

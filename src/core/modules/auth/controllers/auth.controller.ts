@@ -37,38 +37,45 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async login(
     @Body() input: UserLoginInput,
-    @Res({ passthrough: true }) response: Response,
-    @Req() request: Request,
+    @Res({ passthrough: true }) res: Response,
   ) {
-    const tokens = await this.authService.login(input);
-    response.send(tokens);
+    const { tokens, user } = await this.authService.login(input);
+    // Set cookies in response
+    res.cookie('accessToken', tokens.accessToken, { httpOnly: false });
+    res.cookie('refreshToken', tokens.refreshToken, { httpOnly: false });
+    return user;
   }
 
   @UseGuards(RefreshGuard)
   @Get('authenticate')
-  async authenticate(@GetCurrentUser() user: TokenPayload): Promise<any> {
-    const tokens = await this.authService.refreshToken(
+  async authenticate(
+    @GetCurrentUser() user: TokenPayload,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<any> {
+    const { tokens, user: userDto } = await this.authService.refreshToken(
       user.sub,
       user.refreshToken,
     );
-    return {
-      id: user.sub,
-      ...tokens,
-    };
+    // Set cookies in response
+    res.cookie('accessToken', tokens.accessToken, { httpOnly: false });
+    res.cookie('refreshToken', tokens.refreshToken, { httpOnly: false });
+
+    // Send response
+    return userDto;
   }
 
   @UseGuards(RefreshGuard)
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   async refreshToken(@Req() request: Request) {
-    return await this.authService.refreshToken(
+    await this.authService.refreshToken(
       request.user['sub'],
       request.user['refreshToken'],
     );
   }
 
   @UseGuards(AccessTokenGuard)
-  @Post('/logout')
+  @Get('logout')
   @HttpCode(HttpStatus.OK)
   async logout(@GetCurrentUser('sub') id: number) {
     await this.authService.logout(id);

@@ -6,7 +6,10 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    cors: true,
+    cors: {
+      origin: ['http://localhost:4200', /\.natuition\.com$/],
+      // methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    },
   });
   const configService = app.get(ConfigService);
   const port = configService.get<string>('PORT');

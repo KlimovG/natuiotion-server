@@ -86,9 +86,9 @@ type ChartDataDto {
 }
 
 type StatisticDto {
-  voltage: Float!
-  duration: String!
-  totalNumber: Float!
+  voltage: Float
+  duration: String
+  totalNumber: Float
   chart: ChartDataDto
 }
 

@@ -12,6 +12,6 @@ import { UserMapper } from './service/user.mapper';
     TypeOrmModule.forFeature([UserModel]),
   ],
   providers: [UserResolver, UserService, UserMapper],
-  exports: [UserService],
+  exports: [UserService, UserMapper],
 })
 export class UserModule {}

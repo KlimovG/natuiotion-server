@@ -21,7 +21,7 @@ export class JwtService {
     const payload = this.generateTokenPayload(userId);
     return await this.jwt.signAsync(payload, {
       secret: this.configService.get<string>(name),
-      expiresIn: this.configService.get<number>(expiration),
+      expiresIn: this.configService.get<string>(expiration),
     });
   }
 

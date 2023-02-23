@@ -13,6 +13,7 @@ import * as bcrypt from 'bcrypt';
 import { UserRegistrationInput } from '../../../../api/modules/user/dto/input/user-reg-input.dto';
 import { UserLoginInput } from '../../../../api/modules/user/dto/input/user-login-input.dto';
 import { JwtService } from './jwt.service';
+import { UserMapper } from '../../../../api/modules/user/service/user.mapper';
 
 @Injectable()
 export class AuthService {
@@ -20,6 +21,7 @@ export class AuthService {
   constructor(
     private usersService: UserService,
     private jwtService: JwtService,
+    private mapper: UserMapper,
   ) {}
 
   private async hashData(data: string): Promise<string> {
@@ -84,15 +86,15 @@ export class AuthService {
   }
 
   async login({ email: login, password }: UserLoginInput) {
+    this.logger.log('Find user with login');
+    //See if user not exist
+    const user = await this.usersService.findByLogin(login);
+
+    if (!user) {
+      throw new BadRequestException('User not exist');
+    }
+
     try {
-      this.logger.log('Find user with login');
-      //See if user not exist
-      const user = await this.usersService.findByLogin(login);
-
-      if (!user) {
-        throw new BadRequestException('User not exist');
-      }
-
       // Check if password are equal
       await this.verifyPassword(password, user.password);
 
@@ -103,8 +105,11 @@ export class AuthService {
       await this.updateRefresh(user.id, refreshToken);
 
       return {
-        accessToken,
-        refreshToken,
+        tokens: {
+          accessToken,
+          refreshToken,
+        },
+        user: this.mapper.toUserDto(user),
       };
     } catch (e) {
       throw new HttpException(
@@ -138,8 +143,14 @@ export class AuthService {
     const tokens = await this.jwtService.getTokens(userId);
 
     await this.updateRefresh(userId, tokens.refreshToken);
-
-    return tokens;
+    const user = await this.usersService.findById(userId);
+    return {
+      tokens: {
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
+      },
+      user: this.mapper.toUserDto(user),
+    };
   }
 
   private async verifyPassword(password: string, hashedPassword: string) {
