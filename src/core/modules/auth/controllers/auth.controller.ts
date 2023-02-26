@@ -43,6 +43,7 @@ export class AuthController {
     // Set cookies in response
     res.cookie('accessToken', tokens.accessToken, { httpOnly: false });
     res.cookie('refreshToken', tokens.refreshToken, { httpOnly: false });
+    res.cookie('traneDev', tokens.refreshToken, { httpOnly: true });
     return user;
   }
 
@@ -57,21 +58,40 @@ export class AuthController {
       user.refreshToken,
     );
     // Set cookies in response
-    res.cookie('accessToken', tokens.accessToken, { httpOnly: false });
-    res.cookie('refreshToken', tokens.refreshToken, { httpOnly: false });
+    res.cookie('accessToken', tokens.accessToken, {
+      httpOnly: false,
+      sameSite: true,
+    });
+    res.cookie('refreshToken', tokens.refreshToken, {
+      httpOnly: false,
+      sameSite: true,
+    });
 
     // Send response
     return userDto;
   }
 
   @UseGuards(RefreshGuard)
-  @Post('refresh')
+  @Get('refresh')
   @HttpCode(HttpStatus.OK)
-  async refreshToken(@Req() request: Request) {
-    await this.authService.refreshToken(
+  async refreshToken(
+    @Req() request: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { tokens } = await this.authService.refreshToken(
       request.user['sub'],
       request.user['refreshToken'],
     );
+    res.cookie('accessToken', tokens.accessToken, {
+      httpOnly: false,
+      sameSite: true,
+    });
+    res.cookie('refreshToken', tokens.refreshToken, {
+      httpOnly: false,
+      sameSite: true,
+    });
+
+    return true;
   }
 
   @UseGuards(AccessTokenGuard)
