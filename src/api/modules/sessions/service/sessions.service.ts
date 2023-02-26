@@ -26,6 +26,7 @@ export class SessionsService implements BaseService<SessionsModel> {
       order: {
         startTime: 'DESC',
       },
+      take: 10,
     });
   }
 
