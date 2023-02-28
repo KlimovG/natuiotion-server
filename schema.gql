@@ -1,0 +1,124 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type UserModel {
+  id: Float!
+  name: String!
+  email: String!
+  phone: String!
+  password: String!
+}
+
+type UserDto {
+  id: Float!
+  name: String!
+}
+
+type RobotModel {
+  serial: String!
+}
+
+type VescStatisticModel {
+  id: Float!
+  sessionModel: SessionsModel!
+  sessionId: Float!
+  voltage: Float!
+  timestamp: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type WeedTypesModel {
+  id: Float!
+  label: String!
+}
+
+type GpsPointModel {
+  id: Float!
+  quality: Float!
+  latitude: Float!
+  longitude: Float!
+}
+
+type PointOfPathsModel {
+  id: Float!
+  pointNumber: Float!
+  gpsPoint: GpsPointModel!
+  extractedWeed: [ExtractedWeedsModel!]
+}
+
+type ExtractedWeedsModel {
+  id: Float!
+  pointPathId: Float!
+  pointPath: PointOfPathsModel
+  sessionId: Float!
+  session: SessionsModel!
+  weedType: WeedTypesModel!
+  number: Float!
+}
+
+type FieldModel {
+  id: Float!
+  label: String!
+  corners: [[Float!]!]!
+}
+
+type SessionsModel {
+  id: Float!
+  startTime: DateTime!
+  endTime: DateTime!
+  prevSessionId: Float
+  robotSerialNumber: RobotModel!
+  robotNumber: String!
+  extractedWeeds: [ExtractedWeedsModel!]
+  fieldName: FieldModel!
+  statistic: VescStatisticModel
+  extracted: Float
+}
+
+type ChartDataDto {
+  labels: [String!]!
+  data: [Float!]!
+}
+
+type StatisticDto {
+  voltage: Float
+  duration: String
+  totalNumber: Float
+  chart: ChartDataDto
+}
+
+type ExtractedDto {
+  id: Float!
+  pointPath: [Float!]
+  weedType: String!
+  number: Float!
+}
+
+type Query {
+  customers: [UserModel!]!
+  customer(id: Float!, name: String!, email: String!, phone: String!): UserDto!
+  getAllRobotsWithCustomers: [RobotModel!]!
+  getAllSessions: [SessionsModel!]!
+  getSessionsForRobot(serial: String!): [SessionsModel!]!
+  getStatisticForSession(session: Float!): VescStatisticModel!
+  getRobotStats(session: Float!): StatisticDto!
+  getField(id: Float!): FieldModel!
+  getExtractedPoints(sessionId: Float!): [ExtractedDto!]
+  getPath(sessionId: Float!): [[Float!]!]
+}
+
+type Mutation {
+  createUser(data: UserRegistrationInput!): UserModel!
+}
+
+input UserRegistrationInput {
+  name: String!
+  email: String!
+  phone: String!
+  password: String!
+}
