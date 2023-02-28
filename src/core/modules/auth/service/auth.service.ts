@@ -85,7 +85,7 @@ export class AuthService {
     }
   }
 
-  async login({ email: login, password }: UserLoginInput) {
+  async login({ login, password }: UserLoginInput) {
     this.logger.log('Find user with login');
     //See if user not exist
     const user = await this.usersService.findByLogin(login);
