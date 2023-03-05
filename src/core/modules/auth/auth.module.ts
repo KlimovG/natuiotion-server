@@ -13,7 +13,7 @@ import { JwtService } from './service/jwt.service';
   imports: [
     forwardRef(() => UserModule),
     PassportModule.register({
-      defaultStrategy: 'jwt',
+      defaultStrategy: 'jwt-access',
     }),
     JwtModule.register({}),
   ],

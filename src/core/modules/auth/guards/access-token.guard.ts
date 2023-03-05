@@ -1,10 +1,16 @@
 import { AuthGuard } from '@nestjs/passport';
 import { ExecutionContext } from '@nestjs/common';
+import { GqlExecutionContext } from '@nestjs/graphql';
+import { ExecutionContextHost } from '@nestjs/core/helpers/execution-context-host';
 
-export class AccessTokenGuard extends AuthGuard('jwt') {
+export class AccessTokenGuard extends AuthGuard('jwt-access') {
+  constructor() {
+    super();
+  }
   async canActivate(context: ExecutionContext) {
-    const result = (await super.canActivate(context)) as boolean;
-
-    return result;
+    const ctx = GqlExecutionContext.create(context).getContext().req;
+    return (await super.canActivate(
+      new ExecutionContextHost([ctx]),
+    )) as boolean;
   }
 }
