@@ -14,13 +14,11 @@ export class UserResolver {
     private robotsService: RobotsService,
   ) {}
 
-  // @UseGuards(GqlAuthGuard)
   @Query((returns) => [UserModel])
   async customers(): Promise<UserModel[]> {
     return await this.customerService.findAll();
   }
 
-  // @UseGuards(GqlAuthGuard)
   @Query((returns) => UserDto)
   async customer(@Args() user: GetUserArgs): Promise<UserDto> {
     return await this.customerService.getUser(user.email);
