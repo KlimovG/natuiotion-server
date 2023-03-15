@@ -11,6 +11,8 @@ import { MapService } from '../service/map.service';
 import { FieldModel } from '../models/field.model';
 import { ExtractedDto } from '../dto/extracted.dto';
 import { AccessTokenGuard } from '../../../../core/modules/auth/guards/access-token.guard';
+import { MapDataDto } from '../dto/map-data.dto';
+import { PathDto } from '../dto/path.dto';
 
 @Resolver(FieldModel)
 export class MapResolver {
@@ -31,10 +33,22 @@ export class MapResolver {
   }
 
   @UseGuards(AccessTokenGuard)
-  @Query(() => [[Float, Float]], { nullable: true })
-  async getPath(
-    @Args('sessionId') sessionId: number,
-  ): Promise<[number, number][]> {
+  @Query(() => [MapDataDto], { nullable: true })
+  async getMapData(@Args('sessionId') sessionId: number): Promise<MapDataDto> {
+    const field = await this.service.getField(sessionId);
+    const path = await this.service.getPath(sessionId);
+    const extracted = await this.service.getExtractedPoints(sessionId);
+
+    return {
+      field,
+      path,
+      extracted,
+    };
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Query(() => PathDto, { nullable: true })
+  async getPath(@Args('sessionId') sessionId: number): Promise<PathDto> {
     return await this.service.getPath(sessionId);
   }
 
