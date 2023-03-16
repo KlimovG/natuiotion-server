@@ -10,7 +10,7 @@ import { AccessTokenGuard } from '../../../../core/modules/auth/guards/access-to
 import { GetCurrentUser } from '../../../../core/modules/auth/decorators/current-user.decorator';
 import { TokenPayload } from '../../../../core/modules/auth/service/jwt.service';
 
-@Resolver((of) => RobotModel)
+@Resolver(() => RobotModel)
 export class RobotsResolver {
   private readonly logger = new Logger('Robot');
 
@@ -45,11 +45,11 @@ export class RobotsResolver {
   }
 
   @UseGuards(AccessTokenGuard)
-  @Query((returns) => [RobotModel])
-  async getAllRobotsWithCustomers(
-    @GetCurrentUser() { sub }: TokenPayload,
+  @Query(() => [RobotModel])
+  async getRobotForUser(
+    @GetCurrentUser() user: TokenPayload,
   ): Promise<RobotModel[]> {
-    this.logger.log(`Getting robots for user ${sub}`);
-    return await this.robotService.findByCustomer(sub);
+    this.logger.log(`Getting robots for user ${user.sub}`);
+    return await this.robotService.findByCustomer(user.sub);
   }
 }
