@@ -7,8 +7,10 @@ import { HttpService } from '@nestjs/axios';
 import { catchError, firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
 import { AccessTokenGuard } from '../../../../core/modules/auth/guards/access-token.guard';
+import { GetCurrentUser } from '../../../../core/modules/auth/decorators/current-user.decorator';
+import { TokenPayload } from '../../../../core/modules/auth/service/jwt.service';
 
-@Resolver((of) => RobotModel)
+@Resolver(() => RobotModel)
 export class RobotsResolver {
   private readonly logger = new Logger('Robot');
 
@@ -19,11 +21,6 @@ export class RobotsResolver {
     private readonly httpService: HttpService,
   ) {}
 
-  // @Query((returns) => RobotModel)
-  // async getOneRobotWithCustomer(@Args('id') id: number): Promise<RobotModel> {
-  //   return await this.robotService.findOne(id);
-  // }
-  //
   @UseGuards(AccessTokenGuard)
   @Query((returns) => String)
   async getRobotStatus(@Args('name') name: string): Promise<any> {
@@ -48,8 +45,11 @@ export class RobotsResolver {
   }
 
   @UseGuards(AccessTokenGuard)
-  @Query((returns) => [RobotModel])
-  async getAllRobotsWithCustomers(): Promise<RobotModel[]> {
-    return await this.robotService.findAll();
+  @Query(() => [RobotModel])
+  async getRobotForUser(
+    @GetCurrentUser() user: TokenPayload,
+  ): Promise<RobotModel[]> {
+    this.logger.log(`Getting robots for user ${user.sub}`);
+    return await this.robotService.findByCustomer(user.sub);
   }
 }
