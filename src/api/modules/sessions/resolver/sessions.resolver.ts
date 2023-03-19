@@ -27,20 +27,15 @@ export class SessionsResolver {
   async getSessionsForRobot(
     @Args('serial') serial: string,
   ): Promise<SessionsModel[]> {
-    const sessions = await this.service.findAllByName(serial);
-    return sessions.map((session) => {
-      if (session?.extractedWeeds && session?.extractedWeeds?.length) {
-        const extracted = session.extractedWeeds.reduce(
-          (acc, value) => acc + value.number,
-          0,
-        );
-        return {
-          ...session,
-          extracted,
-        };
-      }
-      return session;
-    });
+    return await this.service.findAllByName(serial);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Query(() => String)
+  async getLastSessionForRobot(
+    @Args('serial') serial: string,
+  ): Promise<string> {
+    return (await this.service.findLast(serial))?.id.toString();
   }
 
   @UseGuards(AccessTokenGuard)
@@ -49,23 +44,10 @@ export class SessionsResolver {
     @Args('serial') serial: string,
     @Args('sessionId') sessionId: number,
   ): Promise<SessionsModel[]> {
-    const sessions = await this.service.findAllByNameStartFromSessionWithId(
+    return await this.service.findAllByNameStartFromSessionWithId(
       serial,
       sessionId,
     );
-    return sessions.map((session) => {
-      if (session?.extractedWeeds && session?.extractedWeeds?.length) {
-        const extracted = session.extractedWeeds.reduce(
-          (acc, value) => acc + value.number,
-          0,
-        );
-        return {
-          ...session,
-          extracted,
-        };
-      }
-      return session;
-    });
   }
 
   @ResolveField(() => VescStatisticModel)

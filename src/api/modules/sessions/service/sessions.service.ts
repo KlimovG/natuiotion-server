@@ -17,8 +17,25 @@ export class SessionsService implements BaseService<SessionsModel> {
     return this.sessionRepo.find();
   }
 
+  async findLast(robotSerialNumber: string): Promise<SessionsModel> {
+    return (
+      await this.sessionRepo.find({
+        where: {
+          robotNumber: robotSerialNumber,
+        },
+        relations: {
+          extractedWeeds: true,
+        },
+        order: {
+          startTime: 'DESC',
+        },
+        take: 1,
+      })
+    ).at(0);
+  }
+
   async findAllByName(robotSerialNumber: string): Promise<SessionsModel[]> {
-    return this.sessionRepo.find({
+    const sessions = await this.sessionRepo.find({
       where: {
         robotNumber: robotSerialNumber,
       },
@@ -30,6 +47,8 @@ export class SessionsService implements BaseService<SessionsModel> {
       },
       take: 10,
     });
+
+    return this.mapSessionsToClient(sessions);
   }
 
   findOne(id: number): Promise<SessionsModel> {
@@ -47,8 +66,7 @@ export class SessionsService implements BaseService<SessionsModel> {
     this.logger.log(
       `Find 10 more sessions from ${startSession.startTime.toDateString()} for robot ${robotSerialNumber}`,
     );
-
-    return this.sessionRepo.find({
+    const sessions = await this.sessionRepo.find({
       where: {
         robotNumber: robotSerialNumber,
         startTime: LessThan(startSession.startTime),
@@ -60,6 +78,25 @@ export class SessionsService implements BaseService<SessionsModel> {
         startTime: 'DESC',
       },
       take: 10,
+    });
+    return this.mapSessionsToClient(sessions);
+  }
+
+  private mapSessionsToClient(sessions: SessionsModel[]): SessionsModel[] {
+    return sessions.map((session) => {
+      if (session?.extractedWeeds && session?.extractedWeeds?.length) {
+        session.extracted = session.extractedWeeds.reduce(
+          (acc, value) => acc + value.number,
+          0,
+        );
+      }
+      const label = session?.fieldName?.label;
+      if (!!label) {
+        session.fieldName.label = session.fieldName.label
+          .replace(/[\W_]+(?=-)|\d+(?=%)|%.*?\d+\s?/g, ' ')
+          .trim();
+      }
+      return session;
     });
   }
 }
