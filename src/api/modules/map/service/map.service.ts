@@ -28,7 +28,11 @@ export class MapService {
   async getField(id: number): Promise<FieldModel> {
     this.logger.log(`Getting field for session with ID:${id}`);
     const { fieldId } = await this.sessionsService.findOne(id);
-    return await this.fieldRepo.findOneBy({ id: fieldId });
+    const field = await this.fieldRepo.findOneBy({ id: fieldId });
+    field.label = field.label
+      .replace(/[\W_]+(?=-)|\d+(?=%)|%.*?\d+\s?/g, ' ')
+      .trim();
+    return field;
   }
 
   async getPath(sessionId: number): Promise<PathDto> {
