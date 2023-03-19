@@ -1,6 +1,6 @@
 import { RobotModel } from '../models/robot.model';
 import { Inject, Logger, UseGuards } from '@nestjs/common';
-import { Query, Resolver } from '@nestjs/graphql';
+import { Args, Query, Resolver } from '@nestjs/graphql';
 import { RobotsService } from '../service/robots.service';
 import { UserService } from '../../user/service/user.service';
 import { AccessTokenGuard } from '../../../../core/modules/auth/guards/access-token.guard';
@@ -24,5 +24,12 @@ export class RobotsResolver {
   ): Promise<RobotModel[]> {
     this.logger.log(`Getting robots for user ${user.sub}`);
     return await this.robotService.findByCustomer(user.sub);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Query(() => RobotModel)
+  async getRobotStatus(@Args('serial') serial: string): Promise<RobotModel> {
+    this.logger.log(`Getting status for robot ${serial}`);
+    return await this.robotService.getRobotWithStatus(serial);
   }
 }

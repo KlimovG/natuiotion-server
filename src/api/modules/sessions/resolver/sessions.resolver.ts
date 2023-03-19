@@ -31,6 +31,14 @@ export class SessionsResolver {
   }
 
   @UseGuards(AccessTokenGuard)
+  @Query(() => String)
+  async getLastSessionForRobot(
+    @Args('serial') serial: string,
+  ): Promise<string> {
+    return (await this.service.findLast(serial))?.id.toString();
+  }
+
+  @UseGuards(AccessTokenGuard)
   @Query(() => [SessionsModel])
   async getMoreSessionsForRobot(
     @Args('serial') serial: string,

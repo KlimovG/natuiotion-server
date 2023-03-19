@@ -17,6 +17,23 @@ export class SessionsService implements BaseService<SessionsModel> {
     return this.sessionRepo.find();
   }
 
+  async findLast(robotSerialNumber: string): Promise<SessionsModel> {
+    return (
+      await this.sessionRepo.find({
+        where: {
+          robotNumber: robotSerialNumber,
+        },
+        relations: {
+          extractedWeeds: true,
+        },
+        order: {
+          startTime: 'DESC',
+        },
+        take: 1,
+      })
+    ).at(0);
+  }
+
   async findAllByName(robotSerialNumber: string): Promise<SessionsModel[]> {
     const sessions = await this.sessionRepo.find({
       where: {
