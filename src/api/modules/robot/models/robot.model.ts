@@ -1,5 +1,6 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { RobotStatus } from './status.model';
 
 @ObjectType()
 @Entity('Robots_of_customers')
@@ -15,4 +16,7 @@ export class RobotModel {
   @Field()
   @Column({ name: 'robot_serial_number' })
   serial: string;
+
+  @Field(() => RobotStatus)
+  status: RobotStatus;
 }
