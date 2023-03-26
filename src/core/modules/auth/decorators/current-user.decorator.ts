@@ -6,7 +6,8 @@ export const getCurrentUserByContext = (context: ExecutionContext) => {
     return context.switchToHttp().getRequest().user;
   }
   const ctx = GqlExecutionContext.create(context);
-
+  const user = ctx.getContext().req.user;
+  if (!user) return false;
   return ctx.getContext().req.user;
 };
 

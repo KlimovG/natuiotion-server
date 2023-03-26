@@ -14,14 +14,19 @@ import { UserRegistrationInput } from '../../../../api/modules/user/dto/input/us
 import { UserLoginInput } from '../../../../api/modules/user/dto/input/user-login-input.dto';
 import { JwtService } from './jwt.service';
 import { UserMapper } from '../../../../api/modules/user/service/user.mapper';
+import { DateTime } from 'luxon';
+import { ConfigService } from '@nestjs/config';
+import { Response } from 'express';
 
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger('AuthService');
+
   constructor(
     private usersService: UserService,
     private jwtService: JwtService,
     private mapper: UserMapper,
+    private config: ConfigService,
   ) {}
 
   private async hashData(data: string): Promise<string> {
@@ -85,7 +90,7 @@ export class AuthService {
     }
   }
 
-  async login({ login, password }: UserLoginInput) {
+  async login({ login, password }: UserLoginInput, res: Response) {
     this.logger.log('Find user with login');
     //See if user not exist
     const user = await this.usersService.findByLogin(login);
@@ -95,22 +100,18 @@ export class AuthService {
     }
 
     try {
-      // Check if password are equal
+      // Check if passwords are equal
       await this.verifyPassword(password, user.password);
 
-      const { accessToken, refreshToken } = await this.jwtService.getTokens(
+      const { refreshToken, accessToken } = await this.jwtService.getTokens(
         user.id,
       );
 
       await this.updateRefresh(user.id, refreshToken);
 
-      return {
-        tokens: {
-          accessToken,
-          refreshToken,
-        },
-        user: this.mapper.toUserDto(user),
-      };
+      this.generateCookies(refreshToken, res);
+
+      return this.mapper.toUserDto(user, accessToken);
     } catch (e) {
       throw new HttpException(
         'Wrong credentials provided',
@@ -119,7 +120,9 @@ export class AuthService {
     }
   }
 
-  async logout(userId: number) {
+  async logout(userId: number, res: Response) {
+    res.clearCookie('accessToken');
+    res.clearCookie('refresh-token');
     await this.usersService.update(userId, {
       refreshToken: null,
     });
@@ -137,20 +140,20 @@ export class AuthService {
     return true;
   }
 
-  async refreshToken(userId: number, rt: string) {
+  async refreshToken(userId: number, rt: string, res: Response) {
     await this.verifyRefreshToken(userId, rt);
 
-    const tokens = await this.jwtService.getTokens(userId);
+    const { refreshToken, accessToken } = await this.jwtService.getTokens(
+      userId,
+    );
 
-    await this.updateRefresh(userId, tokens.refreshToken);
+    await this.updateRefresh(userId, refreshToken);
+
+    this.generateCookies(refreshToken, res);
+
     const user = await this.usersService.findById(userId);
-    return {
-      tokens: {
-        accessToken: tokens.accessToken,
-        refreshToken: tokens.refreshToken,
-      },
-      user: this.mapper.toUserDto(user),
-    };
+
+    return this.mapper.toUserDto(user, accessToken);
   }
 
   private async verifyPassword(password: string, hashedPassword: string) {
@@ -164,7 +167,7 @@ export class AuthService {
     }
   }
 
-  async updateRefresh(userId: number, rt: string) {
+  private async updateRefresh(userId: number, rt: string) {
     const hashedToken = await this.hashData(rt);
 
     try {
@@ -174,5 +177,17 @@ export class AuthService {
     } finally {
       this.logger.log('Refresh token was successfully updated');
     }
+  }
+
+  private generateCookies(refreshToken: string, res: Response): void {
+    const duration = this.config.get<string>('COOKIE_REFRESH_EXPIRATION');
+    const endDate = DateTime.now()
+      .plus({ days: parseInt(duration) })
+      .toJSDate();
+
+    res.cookie('refresh-token', refreshToken, {
+      httpOnly: true,
+      expires: endDate,
+    });
   }
 }

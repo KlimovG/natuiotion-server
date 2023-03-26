@@ -10,7 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from '../service/auth.service';
-import { Response, Request } from 'express';
+import { Request, Response } from 'express';
 import { AccessTokenGuard } from '../guards/access-token.guard';
 import { UserRegistrationInput } from '../../../../api/modules/user/dto/input/user-reg-input.dto';
 import { UserLoginInput } from '../../../../api/modules/user/dto/input/user-login-input.dto';
@@ -33,18 +33,14 @@ export class AuthController {
   }> {
     return await this.authService.registration(user);
   }
+
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(
     @Body() input: UserLoginInput,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const { tokens, user } = await this.authService.login(input);
-    // Set cookies in response
-    res.cookie('accessToken', tokens.accessToken, { httpOnly: false });
-    res.cookie('refreshToken', tokens.refreshToken, { httpOnly: false });
-    res.cookie('traneDev', tokens.refreshToken, { httpOnly: true });
-    return user;
+    return await this.authService.login(input, res);
   }
 
   @UseGuards(RefreshGuard)
@@ -53,22 +49,11 @@ export class AuthController {
     @GetCurrentUser() user: TokenPayload,
     @Res({ passthrough: true }) res: Response,
   ): Promise<any> {
-    const { tokens, user: userDto } = await this.authService.refreshToken(
+    return await this.authService.refreshToken(
       user.sub,
       user.refreshToken,
+      res,
     );
-    // Set cookies in response
-    res.cookie('accessToken', tokens.accessToken, {
-      httpOnly: false,
-      sameSite: true,
-    });
-    res.cookie('refreshToken', tokens.refreshToken, {
-      httpOnly: false,
-      sameSite: true,
-    });
-
-    // Send response
-    return userDto;
   }
 
   @UseGuards(RefreshGuard)
@@ -78,26 +63,20 @@ export class AuthController {
     @Req() request: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const { tokens } = await this.authService.refreshToken(
+    return await this.authService.refreshToken(
       request.user['sub'],
       request.user['refreshToken'],
+      res,
     );
-    res.cookie('accessToken', tokens.accessToken, {
-      httpOnly: false,
-      sameSite: true,
-    });
-    res.cookie('refreshToken', tokens.refreshToken, {
-      httpOnly: false,
-      sameSite: true,
-    });
-
-    return true;
   }
 
   @UseGuards(AccessTokenGuard)
   @Get('logout')
   @HttpCode(HttpStatus.OK)
-  async logout(@GetCurrentUser('sub') id: number) {
-    await this.authService.logout(id);
+  async logout(
+    @GetCurrentUser('sub') id: number,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    await this.authService.logout(id, res);
   }
 }
