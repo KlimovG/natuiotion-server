@@ -9,6 +9,7 @@ import {
   Unique,
 } from 'typeorm';
 import { Logger } from '@nestjs/common';
+import { Role } from '../../../../core/modules/auth/decorators/role.decorator';
 
 @ObjectType()
 @Entity('Customers')
@@ -38,6 +39,13 @@ export class UserModel {
 
   @Column({ name: 'hash_rt', length: 20, nullable: true })
   refreshToken: string;
+
+  @Column({
+    type: 'enum',
+    enum: Role,
+    default: Role.USER,
+  })
+  role: Role;
 
   @AfterInsert()
   logInsert() {
