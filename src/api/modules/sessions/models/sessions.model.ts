@@ -45,6 +45,7 @@ export class SessionsModel {
 
   @Field(() => [ExtractedWeedsModel], { nullable: true })
   @OneToMany(() => ExtractedWeedsModel, (extracted) => extracted.session)
+  @JoinColumn({ name: 'extracted-weeds' })
   extractedWeeds: ExtractedWeedsModel[];
 
   @Field(() => FieldModel)
