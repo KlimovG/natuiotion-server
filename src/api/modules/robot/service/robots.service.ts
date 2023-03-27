@@ -6,6 +6,7 @@ import { catchError, firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
 import { RobotStatus } from '../models/status.model';
 import { HttpService } from '@nestjs/axios';
+import { DateTime } from 'luxon';
 
 @Injectable()
 export class RobotsService {
@@ -44,12 +45,46 @@ export class RobotsService {
           }),
         ),
     );
-
     if (!data) {
       robot.status = RobotStatus.OFF;
       return robot;
     }
-    robot.status = data['robot_synthesis'] as RobotStatus;
+
+    if (data && data['heartbeat_timestamp']) {
+      const lastHeartbeat = DateTime.fromISO(data['heartbeat_timestamp']);
+      const now = DateTime.now();
+      const dateDiff = now.diff(lastHeartbeat, 'seconds').seconds;
+      robot.status = dateDiff > 60 ? RobotStatus.OFF : RobotStatus.ACTIVE;
+      return robot;
+    }
+
+    if (data && data['robot_synthesis']) {
+      const status = data['robot_synthesis'] as RobotStatus;
+      switch (status) {
+        case RobotStatus.ACTIVE:
+          robot.status = RobotStatus.ACTIVE;
+          break;
+        case RobotStatus.ON:
+          robot.status = RobotStatus.ON;
+          break;
+        case RobotStatus.PROBLEM:
+          robot.status = RobotStatus.PROBLEM;
+          break;
+        case RobotStatus.LEFT_AREA:
+          robot.status = RobotStatus.LEFT_AREA;
+          break;
+        case RobotStatus.OFF:
+          robot.status = RobotStatus.OFF;
+          break;
+        default:
+          robot.status = RobotStatus.OFF;
+          break;
+      }
+    }
+
+    // if (data['robot_synthesis'] === 'OFFLINE') {
+    // }
+    // robot.status = data['robot_synthesis'] as RobotStatus;
     return robot;
   }
 
