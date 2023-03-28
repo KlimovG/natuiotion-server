@@ -29,7 +29,6 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
   ): Promise<{
     accessToken: string;
-    refreshToken: string;
   }> {
     return await this.authService.registration(user);
   }
