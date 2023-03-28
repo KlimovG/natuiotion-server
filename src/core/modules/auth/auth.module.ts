@@ -4,7 +4,6 @@ import { AuthService } from './service/auth.service';
 import { AccessTokenStrategy } from './strategies';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { LocalStrategy } from './strategies';
 import { AuthController } from './controllers/auth.controller';
 import { RefreshTokenStrategy } from './strategies';
 import { JwtService } from './service/jwt.service';
@@ -21,7 +20,6 @@ import { JwtService } from './service/jwt.service';
     AuthService,
     JwtService,
     AccessTokenStrategy,
-    LocalStrategy,
     RefreshTokenStrategy,
   ],
   exports: [AuthService, JwtService],
