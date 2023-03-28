@@ -123,8 +123,11 @@ export class AuthService {
   }
 
   async logout(userId: number, res: Response) {
+    // clear tokens from cookie
     res.clearCookie('accessToken');
     res.clearCookie('refresh-token');
+
+    // clear token from db
     await this.usersService.update(userId, {
       refreshToken: null,
     });
@@ -143,8 +146,6 @@ export class AuthService {
   }
 
   async refreshToken(userId: number, rt: string, res: Response) {
-    await this.verifyRefreshToken(userId, rt);
-
     const { refreshToken, accessToken } = await this.jwtService.getTokens(
       userId,
     );
