@@ -42,11 +42,11 @@ export class AuthService {
     name,
   }: UserRegistrationInput): Promise<{
     accessToken: string;
-    refreshToken: string;
   }> {
     this.logger.log('Check if the user with this login already exist');
     //See if user already in use
     const isUser = await this.usersService.findByLogin(login);
+
     if (!!isUser?.email) {
       throw new BadRequestException('User exist');
     }
@@ -78,7 +78,9 @@ export class AuthService {
 
       this.logger.log(`User with id ${user.id} was created`);
 
-      return { accessToken, refreshToken };
+      await this.updateRefresh(user.id, refreshToken);
+
+      return { accessToken };
     } catch (error) {
       if (error.message.includes('User already exists')) {
         throw new ConflictException('User already exists');
@@ -109,7 +111,7 @@ export class AuthService {
 
       await this.updateRefresh(user.id, refreshToken);
 
-      this.generateCookies(refreshToken, res);
+      this.generateRefreshCookie(refreshToken, res);
 
       return this.mapper.toUserDto(user, accessToken);
     } catch (e) {
@@ -121,8 +123,11 @@ export class AuthService {
   }
 
   async logout(userId: number, res: Response) {
+    // clear tokens from cookie
     res.clearCookie('accessToken');
     res.clearCookie('refresh-token');
+
+    // clear token from db
     await this.usersService.update(userId, {
       refreshToken: null,
     });
@@ -141,15 +146,13 @@ export class AuthService {
   }
 
   async refreshToken(userId: number, rt: string, res: Response) {
-    await this.verifyRefreshToken(userId, rt);
-
     const { refreshToken, accessToken } = await this.jwtService.getTokens(
       userId,
     );
 
     await this.updateRefresh(userId, refreshToken);
 
-    this.generateCookies(refreshToken, res);
+    this.generateRefreshCookie(refreshToken, res);
 
     const user = await this.usersService.findById(userId);
 
@@ -179,7 +182,7 @@ export class AuthService {
     }
   }
 
-  private generateCookies(refreshToken: string, res: Response): void {
+  private generateRefreshCookie(refreshToken: string, res: Response): void {
     const duration = this.config.get<string>('COOKIE_REFRESH_EXPIRATION');
     const endDate = DateTime.now()
       .plus({ days: parseInt(duration) })

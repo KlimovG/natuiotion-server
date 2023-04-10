@@ -82,9 +82,6 @@ export class RobotsService {
       }
     }
 
-    // if (data['robot_synthesis'] === 'OFFLINE') {
-    // }
-    // robot.status = data['robot_synthesis'] as RobotStatus;
     return robot;
   }
 

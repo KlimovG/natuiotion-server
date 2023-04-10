@@ -5,12 +5,11 @@ import {
   HttpCode,
   HttpStatus,
   Post,
-  Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from '../service/auth.service';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { AccessTokenGuard } from '../guards/access-token.guard';
 import { UserRegistrationInput } from '../../../../api/modules/user/dto/input/user-reg-input.dto';
 import { UserLoginInput } from '../../../../api/modules/user/dto/input/user-login-input.dto';
@@ -29,7 +28,6 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
   ): Promise<{
     accessToken: string;
-    refreshToken: string;
   }> {
     return await this.authService.registration(user);
   }
@@ -60,12 +58,12 @@ export class AuthController {
   @Get('refresh')
   @HttpCode(HttpStatus.OK)
   async refreshToken(
-    @Req() request: Request,
+    @GetCurrentUser() user: TokenPayload,
     @Res({ passthrough: true }) res: Response,
   ) {
     return await this.authService.refreshToken(
-      request.user['sub'],
-      request.user['refreshToken'],
+      user.sub,
+      user.refreshToken,
       res,
     );
   }
