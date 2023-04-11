@@ -56,7 +56,7 @@ export class RobotsService {
       const dateDiff = now.diff(lastHeartbeat, 'seconds').seconds;
 
       if (dateDiff > 60) {
-        robot.status = dateDiff > 60 ? RobotStatus.OFF : RobotStatus.ONLINE;
+        robot.status = RobotStatus.OFF;
         return robot;
       }
 
