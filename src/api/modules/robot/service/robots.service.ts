@@ -50,35 +50,38 @@ export class RobotsService {
       return robot;
     }
 
-    if (data && data['heartbeat_timestamp']) {
+    if (data) {
       const lastHeartbeat = DateTime.fromISO(data['heartbeat_timestamp']);
       const now = DateTime.now();
       const dateDiff = now.diff(lastHeartbeat, 'seconds').seconds;
-      robot.status = dateDiff > 60 ? RobotStatus.OFF : RobotStatus.ACTIVE;
-      return robot;
-    }
 
-    if (data && data['robot_synthesis']) {
-      const status = data['robot_synthesis'] as RobotStatus;
-      switch (status) {
-        case RobotStatus.ACTIVE:
-          robot.status = RobotStatus.ACTIVE;
-          break;
-        case RobotStatus.ON:
-          robot.status = RobotStatus.ON;
-          break;
-        case RobotStatus.PROBLEM:
-          robot.status = RobotStatus.PROBLEM;
-          break;
-        case RobotStatus.LEFT_AREA:
-          robot.status = RobotStatus.LEFT_AREA;
-          break;
-        case RobotStatus.OFF:
-          robot.status = RobotStatus.OFF;
-          break;
-        default:
-          robot.status = RobotStatus.OFF;
-          break;
+      if (dateDiff > 60) {
+        robot.status = dateDiff > 60 ? RobotStatus.OFF : RobotStatus.ONLINE;
+        return robot;
+      }
+
+      if (data['robot_synthesis']) {
+        const status = data['robot_synthesis'] as RobotStatus;
+        switch (status) {
+          case RobotStatus.ACTIVE:
+            robot.status = RobotStatus.ACTIVE;
+            break;
+          case RobotStatus.ON:
+            robot.status = RobotStatus.ON;
+            break;
+          case RobotStatus.PROBLEM:
+            robot.status = RobotStatus.PROBLEM;
+            break;
+          case RobotStatus.LEFT_AREA:
+            robot.status = RobotStatus.LEFT_AREA;
+            break;
+          case RobotStatus.OFF:
+            robot.status = RobotStatus.OFF;
+            break;
+          default:
+            robot.status = RobotStatus.OFF;
+            break;
+        }
       }
     }
 
