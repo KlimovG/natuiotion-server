@@ -10,13 +10,25 @@ type UserModel {
   password: String!
 }
 
+type RobotModel {
+  id: Float!
+  userId: Float!
+  serial: String!
+  status: RobotStatus!
+}
+
+enum RobotStatus {
+  ON
+  ACTIVE
+  LEFT_AREA
+  PROBLEM
+  OFF
+}
+
 type UserDto {
   id: Float!
   name: String!
-}
-
-type RobotModel {
-  serial: String!
+  token: String!
 }
 
 type VescStatisticModel {
@@ -77,7 +89,7 @@ type SessionsModel {
   extractedWeeds: [ExtractedWeedsModel!]
   fieldName: FieldModel!
   statistic: VescStatisticModel
-  extracted: Float
+  extracted: String
 }
 
 type ChartDataDto {
@@ -99,17 +111,28 @@ type ExtractedDto {
   number: Float!
 }
 
+type PathDto {
+  path: [[Float!]!]
+}
+
+type MapDataDto {
+  extracted: [ExtractedDto!]
+  path: PathDto
+  field: FieldModel
+}
+
 type Query {
   customers: [UserModel!]!
   customer(id: Float!, name: String!, email: String!, phone: String!): UserDto!
-  getAllRobotsWithCustomers: [RobotModel!]!
+  getRobotForUser: [RobotModel!]!
+  getRobotStatus(serial: String!): RobotModel!
   getAllSessions: [SessionsModel!]!
   getSessionsForRobot(serial: String!): [SessionsModel!]!
+  getLastSessionForRobot(serial: String!): String!
+  getMoreSessionsForRobot(serial: String!, sessionId: Float!): [SessionsModel!]!
   getStatisticForSession(session: Float!): VescStatisticModel!
   getRobotStats(session: Float!): StatisticDto!
-  getField(id: Float!): FieldModel!
-  getExtractedPoints(sessionId: Float!): [ExtractedDto!]
-  getPath(sessionId: Float!): [[Float!]!]
+  getMapData(sessionId: Float!): MapDataDto
 }
 
 type Mutation {

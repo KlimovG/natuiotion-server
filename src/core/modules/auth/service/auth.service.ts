@@ -100,6 +100,7 @@ export class AuthService {
     if (!user) {
       throw new BadRequestException('User not exist');
     }
+    const newPass = await this.hashData(password);
 
     try {
       // Check if passwords are equal
