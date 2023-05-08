@@ -59,8 +59,20 @@ export class SessionsService implements BaseService<SessionsModel> {
     return this.mapSessionsToClient(sessions);
   }
 
-  findOne(id: number): Promise<SessionsModel> {
-    return this.sessionRepo.findOneBy({ id });
+  async findOne(id: number): Promise<SessionsModel> {
+    return await this.sessionRepo
+      .createQueryBuilder('session')
+      .leftJoinAndSelect('session.extractedWeeds', 'extractedWeeds')
+      .where('session.id = :id', { id })
+      .select([
+        'session.id AS id',
+        'session.startTime as startTime',
+        'session.endTime as endTime',
+        'session.prevSessionId as prevSessionId',
+        'session.robotNumber as robotNumber',
+        'COUNT(extractedWeeds.number) AS extracted',
+      ])
+      .getRawOne();
   }
 
   async findAllByNameStartFromSessionWithId(

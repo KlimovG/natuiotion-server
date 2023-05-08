@@ -61,5 +61,5 @@ export class SessionsModel {
   statistic: VescStatisticModel;
 
   @Field({ nullable: true })
-  extracted?: number;
+  extracted?: string;
 }
