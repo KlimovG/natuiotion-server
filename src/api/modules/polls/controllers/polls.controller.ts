@@ -14,6 +14,12 @@ export class PollsController {
         this.videoStream = await axios.get('http://172.16.4.89:8080/video', {
           responseType: 'stream',
         });
+
+        // Error handler for the stream
+        this.videoStream.data.on('error', (error) => {
+          console.error('Stream error: ', error);
+          this.videoStream = undefined;
+        });
       }
       res.setHeader(
         'Content-Type',
@@ -22,6 +28,8 @@ export class PollsController {
       this.videoStream.data.pipe(res);
     } catch (e) {
       console.log(e);
+      this.videoStream = undefined;
+      res.status(500).send('Error while streaming video');
     }
   }
 }
