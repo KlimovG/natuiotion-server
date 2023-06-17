@@ -11,7 +11,7 @@ export class PollsController {
   async streamVideo(@Res() res: Response): Promise<any> {
     try {
       if (!this.videoStream) {
-        this.videoStream = await axios.get('http://172.16.4.89:8080/video', {
+        this.videoStream = await axios.get('http://172.16.4.45:8080/video', {
           responseType: 'stream',
         });
 
