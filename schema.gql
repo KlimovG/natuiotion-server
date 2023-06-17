@@ -19,6 +19,7 @@ type RobotModel {
 
 enum RobotStatus {
   ON
+  ONLINE
   ACTIVE
   LEFT_AREA
   PROBLEM

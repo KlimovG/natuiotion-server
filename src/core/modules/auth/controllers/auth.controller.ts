@@ -32,6 +32,13 @@ export class AuthController {
     return await this.authService.registration(user);
   }
 
+  @Get('registration')
+  async testSocket(): Promise<{
+    accessToken: string;
+  }> {
+    return;
+  }
+
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(
