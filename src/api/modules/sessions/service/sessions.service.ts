@@ -62,6 +62,7 @@ export class SessionsService implements BaseService<SessionsModel> {
   async findOne(id: number): Promise<SessionsModel> {
     return await this.sessionRepo
       .createQueryBuilder('session')
+      .innerJoinAndSelect('session.fieldName', 'field')
       .leftJoinAndSelect('session.extractedWeeds', 'extractedWeeds')
       .where('session.id = :id', { id })
       .select([
@@ -70,6 +71,7 @@ export class SessionsService implements BaseService<SessionsModel> {
         'session.endTime as endTime',
         'session.prevSessionId as prevSessionId',
         'session.robotNumber as robotNumber',
+        'field.id as fieldId',
         'COUNT(extractedWeeds.number) AS extracted',
       ])
       .getRawOne();
