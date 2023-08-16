@@ -18,5 +18,5 @@ export class RobotModel {
   serial: string;
 
   @Field(() => RobotStatus, { nullable: true })
-  status: RobotStatus;
+  status?: RobotStatus;
 }
