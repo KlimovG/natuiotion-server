@@ -19,15 +19,9 @@ export class RobotsService {
   ) {}
 
   async findByCustomer(userId: number): Promise<RobotModel[]> {
-    const robots = await this.repository.find({
+    return await this.repository.find({
       where: { userId },
     });
-
-    for await (let robot of robots) {
-      robot = await this.updateStatusForRobot(robot);
-    }
-
-    return robots;
   }
 
   async updateStatusForRobot(robot: RobotModel): Promise<RobotModel> {
