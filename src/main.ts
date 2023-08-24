@@ -8,6 +8,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     cors: {
       origin: ['http://localhost:4200', /\.natuition\.com$/],
+      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+      credentials: true,
     },
   });
   const configService = app.get(ConfigService);

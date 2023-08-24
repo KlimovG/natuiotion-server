@@ -30,6 +30,7 @@ export class RobotsResolver {
   @Query(() => RobotModel)
   async getRobotStatus(@Args('serial') serial: string): Promise<RobotModel> {
     this.logger.log(`Getting status for robot ${serial}`);
-    return await this.robotService.getRobotWithStatus(serial);
+    return null;
+    // return await this.robotService.getRobotWithStatus(serial);
   }
 }

@@ -6,6 +6,7 @@ import { RobotsResolver } from './resolver/robots.resolver';
 import { UserModule } from '../user/user.module';
 import { RobotNumberModel } from './models/robot-number.model';
 import { HttpModule } from '@nestjs/axios';
+import { RobotStatusGateway } from './gateway/robot-status.gateway';
 
 @Module({
   imports: [
@@ -13,7 +14,7 @@ import { HttpModule } from '@nestjs/axios';
     HttpModule,
     TypeOrmModule.forFeature([RobotModel, RobotNumberModel]),
   ],
-  providers: [RobotsService, RobotsResolver],
+  providers: [RobotsService, RobotsResolver, RobotStatusGateway],
   exports: [RobotsService],
 })
 export class RobotsModule {}
