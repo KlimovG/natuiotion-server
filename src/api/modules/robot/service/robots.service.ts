@@ -15,79 +15,11 @@ export class RobotsService {
   constructor(
     @InjectRepository(RobotModel)
     private repository: Repository<RobotModel>,
-    private readonly httpService: HttpService,
   ) {}
 
   async findByCustomer(userId: number): Promise<RobotModel[]> {
     return await this.repository.find({
       where: { userId },
     });
-  }
-
-  async updateStatusForRobot(robot: RobotModel): Promise<RobotModel> {
-    const robotName = robot.serial;
-
-    const { data } = await firstValueFrom(
-      this.httpService
-        .get(
-          `http://172.16.3.5:8080/api/v1/data_gathering/last_robots_status?serial_number=${robotName}`,
-        )
-        .pipe(
-          catchError((error: AxiosError) => {
-            this.logger.error(error.response.data);
-            throw new HttpException(`Bad response: ${error.message}`, 400);
-          }),
-        ),
-    );
-    if (!data) {
-      robot.status = RobotStatus.OFF;
-      return robot;
-    }
-
-    if (data) {
-      const lastHeartbeat = DateTime.fromISO(data['heartbeat_timestamp']);
-      const now = DateTime.now();
-      const dateDiff = now.diff(lastHeartbeat, 'seconds').seconds;
-
-      if (dateDiff > 60) {
-        robot.status = RobotStatus.OFF;
-        return robot;
-      }
-
-      if (data['robot_synthesis']) {
-        const status = data['robot_synthesis'] as RobotStatus;
-        switch (status) {
-          case RobotStatus.ACTIVE:
-            robot.status = RobotStatus.ACTIVE;
-            break;
-          case RobotStatus.ON:
-            robot.status = RobotStatus.ON;
-            break;
-          case RobotStatus.PROBLEM:
-            robot.status = RobotStatus.PROBLEM;
-            break;
-          case RobotStatus.LEFT_AREA:
-            robot.status = RobotStatus.LEFT_AREA;
-            break;
-          case RobotStatus.OFF:
-            robot.status = RobotStatus.OFF;
-            break;
-          default:
-            robot.status = RobotStatus.OFF;
-            break;
-        }
-      }
-    }
-
-    return robot;
-  }
-
-  async getRobotWithStatus(serial: string): Promise<RobotModel> {
-    const robot = (await this.repository.find({ where: { serial } })).at(0);
-
-    if (!robot) {
-      throw new HttpException('Robot was not found', 404);
-    }
-    return await this.updateStatusForRobot(robot);
   }
 }

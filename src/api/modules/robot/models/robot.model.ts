@@ -16,7 +16,4 @@ export class RobotModel {
   @Field()
   @Column({ name: 'robot_serial_number' })
   serial: string;
-
-  @Field(() => RobotStatus, { nullable: true })
-  status?: RobotStatus;
 }

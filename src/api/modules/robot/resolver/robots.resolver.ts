@@ -25,12 +25,4 @@ export class RobotsResolver {
     this.logger.log(`Getting robots for user ${user.sub}`);
     return await this.robotService.findByCustomer(user.sub);
   }
-
-  @UseGuards(AccessTokenGuard)
-  @Query(() => RobotModel)
-  async getRobotStatus(@Args('serial') serial: string): Promise<RobotModel> {
-    this.logger.log(`Getting status for robot ${serial}`);
-    return null;
-    // return await this.robotService.getRobotWithStatus(serial);
-  }
 }
