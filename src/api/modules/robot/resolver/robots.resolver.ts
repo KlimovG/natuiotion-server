@@ -1,6 +1,6 @@
 import { RobotModel } from '../models/robot.model';
 import { Inject, Logger, UseGuards } from '@nestjs/common';
-import { Args, Query, Resolver } from '@nestjs/graphql';
+import { Query, Resolver } from '@nestjs/graphql';
 import { RobotsService } from '../service/robots.service';
 import { UserService } from '../../user/service/user.service';
 import { AccessTokenGuard } from '../../../../core/modules/auth/guards/access-token.guard';

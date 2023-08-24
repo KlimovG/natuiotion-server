@@ -1,6 +1,5 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { RobotStatus } from './status.model';
 
 @ObjectType()
 @Entity('Robots_of_customers')
