@@ -1,7 +1,10 @@
 import {
+  ConnectedSocket,
+  MessageBody,
   OnGatewayConnection,
   SubscribeMessage,
   WebSocketGateway,
+  WebSocketServer,
 } from '@nestjs/websockets';
 import { HttpService } from '@nestjs/axios';
 import { catchError, firstValueFrom } from 'rxjs';
@@ -9,6 +12,7 @@ import { HttpException, Logger } from '@nestjs/common';
 import { AxiosError, AxiosResponse } from 'axios';
 import { RobotStatus } from '../models/status.model';
 import { DateTime } from 'luxon';
+import { Socket } from 'socket.io';
 
 @WebSocketGateway({
   cors: {
@@ -17,28 +21,64 @@ import { DateTime } from 'luxon';
     credentials: true,
   },
 })
-export class RobotStatusGateway implements OnGatewayConnection {
+export class RobotStatusGateway implements OnGatewayConnection<Socket> {
   private readonly logger = new Logger('RobotStatusGateway');
-  private robotStatusInterval: NodeJS.Timeout;
+  private robotStatusInterval: NodeJS.Timeout | null = null;
+  private activeRobots: Map<string, Set<string>> = new Map(); // Map of robotName to Set of client IDs
 
   constructor(private httpService: HttpService) {}
 
-  handleConnection(client: any, robotName: string): any {
-    this.logger.log(`${client} created a connection for robot ${robotName}`);
-  }
+  @WebSocketServer() server;
 
-  @SubscribeMessage('registerRobot')
-  async handleRegister(client: any, robotName: string) {
-    this.logger.log(`Registered robot ${robotName}`);
-
-    if (this.robotStatusInterval) {
-      clearInterval(this.robotStatusInterval);
+  handleConnection(client: Socket): void {
+    this.logger.log(`Client connected: ${client.id}`);
+    if (this.robotStatusInterval === null) {
+      this.startSendingRobotStatus();
     }
 
+    client.on('disconnect', () => {
+      this.logger.log(`Client disconnected: ${client.id}`);
+      // Remove this client from all activeRobots
+      for (const [robotName, clients] of this.activeRobots.entries()) {
+        clients.delete(client.id);
+        if (clients.size === 0) {
+          this.activeRobots.delete(robotName);
+        }
+      }
+
+      if (this.activeRobots.size === 0 && this.robotStatusInterval !== null) {
+        clearInterval(this.robotStatusInterval);
+        this.robotStatusInterval = null;
+      }
+    });
+  }
+
+  @SubscribeMessage('subscribeRobot')
+  async handleSubscribe(
+    @MessageBody() robotName: string,
+    @ConnectedSocket() client: Socket,
+  ): Promise<void> {
+    this.logger.log(
+      `Subscribe for robot ${robotName} and for client ${client.id}`,
+    );
+    if (!this.activeRobots.has(robotName)) {
+      this.activeRobots.set(robotName, new Set());
+    }
+    this.activeRobots.get(robotName).add(client.id);
+    await this.getStatusForRobot(robotName);
+  }
+
+  private startSendingRobotStatus(): void {
     this.robotStatusInterval = setInterval(async () => {
-      const statusResponse = await this.fetchRobotStatus(robotName);
-      await this.emitRobotStatus(client, statusResponse.data);
-    }, 10000);
+      for (const robotName of this.activeRobots.keys()) {
+        await this.getStatusForRobot(robotName);
+      }
+    }, 10000 * 6);
+  }
+
+  async getStatusForRobot(robotName: string) {
+    const statusResponse = await this.fetchRobotStatus(robotName);
+    this.emitRobotStatus(statusResponse.data, robotName);
   }
 
   private async fetchRobotStatus(
@@ -58,11 +98,9 @@ export class RobotStatusGateway implements OnGatewayConnection {
     );
   }
 
-  async emitRobotStatus(client: any, robotName: string) {
-    const statusResponse = await this.fetchRobotStatus(robotName);
-
+  emitRobotStatus(statusResponse: any, robotName: string) {
     if (!statusResponse) {
-      client.emit(`robotStatus_${robotName}`, RobotStatus.OFF);
+      this.server.emit(`robotStatus_${robotName}`, RobotStatus.OFF);
       return;
     }
 
@@ -73,7 +111,7 @@ export class RobotStatusGateway implements OnGatewayConnection {
     const dateDiff = now.diff(lastHeartbeat, 'seconds').seconds;
 
     if (dateDiff > 60) {
-      client.emit(`robotStatus_${robotName}`, RobotStatus.OFF);
+      this.server.emit(`robotStatus_${robotName}`, RobotStatus.OFF);
       return;
     }
 
@@ -81,20 +119,20 @@ export class RobotStatusGateway implements OnGatewayConnection {
       const status = statusResponse['robot_synthesis'] as RobotStatus;
       switch (status) {
         case RobotStatus.ACTIVE:
-          client.emit(`robotStatus_${robotName}`, RobotStatus.ACTIVE);
+          this.server.emit(`robotStatus_${robotName}`, RobotStatus.ACTIVE);
           break;
         case RobotStatus.ON:
-          client.emit(`robotStatus_${robotName}`, RobotStatus.ON);
+          this.server.emit(`robotStatus_${robotName}`, RobotStatus.ON);
           break;
         case RobotStatus.PROBLEM:
-          client.emit(`robotStatus_${robotName}`, RobotStatus.PROBLEM);
+          this.server.emit(`robotStatus_${robotName}`, RobotStatus.PROBLEM);
           break;
         case RobotStatus.LEFT_AREA:
-          client.emit(`robotStatus_${robotName}`, RobotStatus.LEFT_AREA);
+          this.server.emit(`robotStatus_${robotName}`, RobotStatus.LEFT_AREA);
           break;
         case RobotStatus.OFF:
         default:
-          client.emit(`robotStatus_${robotName}`, RobotStatus.OFF);
+          this.server.emit(`robotStatus_${robotName}`, RobotStatus.OFF);
           break;
       }
     }
