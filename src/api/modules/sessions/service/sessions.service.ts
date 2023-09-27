@@ -19,20 +19,17 @@ export class SessionsService implements BaseService<SessionsModel> {
   }
 
   async findLast(robotSerialNumber: string): Promise<SessionsModel> {
-    return (
-      await this.sessionRepo.find({
-        where: {
-          robotNumber: robotSerialNumber,
-        },
-        relations: {
-          extractedWeeds: true,
-        },
-        order: {
-          startTime: 'DESC',
-        },
-        take: 1,
-      })
-    ).at(0);
+    return await this.sessionRepo.findOne({
+      where: {
+        robotNumber: robotSerialNumber,
+      },
+      relations: {
+        extractedWeeds: true,
+      },
+      order: {
+        startTime: 'DESC',
+      },
+    });
   }
 
   async findAllByName(robotSerialNumber: string): Promise<SessionsModel[]> {

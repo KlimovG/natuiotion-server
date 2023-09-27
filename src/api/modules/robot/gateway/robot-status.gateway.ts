@@ -73,7 +73,7 @@ export class RobotStatusGateway implements OnGatewayConnection<Socket> {
       for (const robotName of this.activeRobots.keys()) {
         await this.getStatusForRobot(robotName);
       }
-    }, 10000 * 6);
+    }, 10000 * 3);
   }
 
   async getStatusForRobot(robotName: string) {
@@ -119,19 +119,26 @@ export class RobotStatusGateway implements OnGatewayConnection<Socket> {
       const status = statusResponse['robot_synthesis'] as RobotStatus;
       switch (status) {
         case RobotStatus.ACTIVE:
+          this.logger.log(`${robotName} hast a status: ${RobotStatus.ACTIVE}`);
           this.server.emit(`robotStatus_${robotName}`, RobotStatus.ACTIVE);
           break;
         case RobotStatus.ON:
+          this.logger.log(`${robotName} hast a status: ${RobotStatus.ACTIVE}`);
           this.server.emit(`robotStatus_${robotName}`, RobotStatus.ON);
           break;
         case RobotStatus.PROBLEM:
+          this.logger.log(`${robotName} hast a status: ${RobotStatus.PROBLEM}`);
           this.server.emit(`robotStatus_${robotName}`, RobotStatus.PROBLEM);
           break;
         case RobotStatus.LEFT_AREA:
+          this.logger.log(
+            `${robotName} hast a status: ${RobotStatus.LEFT_AREA}`,
+          );
           this.server.emit(`robotStatus_${robotName}`, RobotStatus.LEFT_AREA);
           break;
         case RobotStatus.OFF:
         default:
+          this.logger.log(`${robotName} hast a status: ${RobotStatus.OFF}`);
           this.server.emit(`robotStatus_${robotName}`, RobotStatus.OFF);
           break;
       }
