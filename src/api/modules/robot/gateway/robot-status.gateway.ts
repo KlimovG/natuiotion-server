@@ -146,7 +146,7 @@ export class RobotStatusGateway
     const httpServer = server.httpServer;
     const addressInfo = httpServer.address();
     this.logger.log(
-      `WebSocket Server is running on ${addressInfo.address}:${addressInfo.port}`,
+      `WebSocket Server is running on ${addressInfo}:${addressInfo}`,
     );
   }
 }
