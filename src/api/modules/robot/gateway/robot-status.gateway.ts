@@ -2,6 +2,7 @@ import {
   ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
+  OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
@@ -21,7 +22,9 @@ import { Socket } from 'socket.io';
     credentials: true,
   },
 })
-export class RobotStatusGateway implements OnGatewayConnection<Socket> {
+export class RobotStatusGateway
+  implements OnGatewayConnection<Socket>, OnGatewayInit
+{
   private readonly logger = new Logger('RobotStatusGateway');
   private robotStatusInterval: NodeJS.Timeout | null = null;
   private activeRobots: Map<string, Set<string>> = new Map(); // Map of robotName to Set of client IDs
@@ -136,5 +139,14 @@ export class RobotStatusGateway implements OnGatewayConnection<Socket> {
           break;
       }
     }
+  }
+
+  afterInit(server: any): any {
+    this.logger.log(`RobotStatusGateway initiated `);
+    const httpServer = server.httpServer;
+    const addressInfo = httpServer.address();
+    this.logger.log(
+      `WebSocket Server is running on ${addressInfo.address}:${addressInfo.port}`,
+    );
   }
 }
