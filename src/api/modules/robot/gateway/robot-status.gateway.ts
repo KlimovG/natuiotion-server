@@ -142,11 +142,18 @@ export class RobotStatusGateway
   }
 
   afterInit(server: any): any {
-    this.logger.log(`RobotStatusGateway initiated ${JSON.stringify(server)}`);
-    // const httpServer = server.httpServer;
-    // const addressInfo = httpServer.address();
-    // this.logger.log(
-    //   `WebSocket Server is running on ${addressInfo}:${addressInfo}`,
-    // );
+    this.logger.log(`RobotStatusGateway initiated ${server}`);
+    server.httpServer.on('listening', () => {
+      const addressInfo = server.httpServer.address();
+      if (addressInfo && typeof addressInfo === 'object') {
+        this.logger.log(
+          `WebSocket Server is running on ${addressInfo.address}:${addressInfo.port}`,
+        );
+      } else {
+        this.logger.log(
+          `WebSocket Server address information is not available`,
+        );
+      }
+    });
   }
 }
